@@ -1,0 +1,15 @@
+<p>tracks works!</p>
+<div class="card-columns">
+    <div *ngFor="let vs of videoSources" class="card">
+        <img *ngIf="videoSources.length &lt;= 16 &amp;&amp; vs.getSnapshotImage != null" 
+            class="card-img-top img-fluid" width="100%"
+            src="{{vs.getSnapshotImage+'?width=160'}}"/>
+        <div class="card-block">
+            <h4>{{vs.displayName}}</h4>
+            <p *ngIf="vs.description != null">{{vs.description}}</p>
+            <a *ngIf="vs.isLive" routerLink="/live-video/{{vs.name}}"><span class="badge badge-success">Live (HLS)</span></a>
+            <a *ngIf="vs.webrtcServers.length &gt; 0" routerLink="/webrtc-video/{{vs.webrtcServers[0].name}}/{{vs.name}}"><span class="badge badge-info">WebRTC</span></a>
+            <span *ngIf="vs.videoTracks.length>0" class="badge badge-info">In {{vs.videoTracks.length}} archive(s)</span>
+        </div>
+    </div>
+</div>
