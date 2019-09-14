@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 
-import {VideoObjectsService} from '../video-objects.service'
-import {VideoSource,VideoArchive,VideoObjects,VideoTrack} from '../video-objects'
+//import {VideoObjectsService} from '../video-objects.service'
+//import {VideoSource,VideoArchive,VideoObjects,VideoTrack} from '../video-objects'
+import {TracksService,TrackInfo} from '../tracks.service'
+import { version } from 'punycode';
 
 @Component({
   selector: 'app-tracks',
@@ -10,17 +12,14 @@ import {VideoSource,VideoArchive,VideoObjects,VideoTrack} from '../video-objects
 })
 export class TracksComponent implements OnInit {
   errorMessage: string;
-  videoSources: VideoSource[];
-  videoArchives: VideoArchive[];
+  public tracks: Array<TrackInfo>;
 
-  constructor(private videoObjectsService: VideoObjectsService) { }
+  constructor(private tracksService: TracksService) { 
+    this.tracks=[];
+  }
 
   ngOnInit() {
-    this.videoObjectsService.getObjects().subscribe(
-      objs => {
-          this.videoSources=objs.videoSources;
-          this.videoArchives=objs.videoArchives;
-      },
+    this.tracksService.getTracks().subscribe(t => { this.tracks=t; },
       error => this.errorMessage=<any>error
   );
 

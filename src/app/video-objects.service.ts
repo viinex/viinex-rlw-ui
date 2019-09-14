@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 
 import { Observable } from "rxjs";
+import { webSocket,WebSocketSubjectConfig, WebSocketSubject } from 'rxjs/webSocket';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/mergeMap';
@@ -25,7 +26,21 @@ import {
 
 @Injectable({providedIn:'root'})
 export class VideoObjectsService {
-    constructor(private http: Http){}
+    public webSocket : WebSocketSubject<any>;
+    constructor(private http: Http){
+      let cfg : WebSocketSubjectConfig<any>={
+        url:"ws://"+location.host,
+        openObserver:{
+          next: ()=>{
+            console.log("websocket connected");
+            this.webSocket.next(["subscribe",{}]);
+            //this.webSocket.next(JSON.stringify(["subscribe",{"topics":["RailcarNumberRecognition"]}]));
+          }
+        }
+      };
+      this.webSocket=webSocket(cfg);
+      //this.webSocket.subscribe(console.log);
+    }
     getObjects(): Observable<VideoObjects>{
         return Observable.zip(
             this.http.get(V1SVC_PATH.slice(0,-1)), // chop off last /
@@ -88,6 +103,8 @@ export class VideoObjectsService {
         vo.videoSources=vs;
         vo.videoArchives=va;
         vo.webrtcServers=wr;
+        vo.meta=bodyMeta;
+        console.log(vo.meta);
         return vo;
     }
     private static extractLiveStreamDetails(res: Response){

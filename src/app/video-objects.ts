@@ -128,5 +128,6 @@ export class VideoObjects {
     videoSources: Array<VideoSource>;
     videoArchives: Array<VideoArchive>;
     webrtcServers: Array<WebRTCServer>;
+    meta : Map<string, any>;
 }
 

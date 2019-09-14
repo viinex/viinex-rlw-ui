@@ -1,15 +1,25 @@
-<p>tracks works!</p>
+<h2>Обслуживаемые пути</h2>
 <div class="card-columns">
-    <div *ngFor="let vs of videoSources" class="card">
-        <img *ngIf="videoSources.length &lt;= 16 &amp;&amp; vs.getSnapshotImage != null" 
-            class="card-img-top img-fluid" width="100%"
-            src="{{vs.getSnapshotImage+'?width=160'}}"/>
+    <div *ngFor="let track of tracks" class="card">
+            <!--img *ngIf="track.liveSnapshotURIs.length != 0" 
+                class="card-img-top img-fluid" width="100%"
+                src="{{track.liveSnapshotURIs[0]+'?width=160'}}"/-->
+        <ngb-carousel>
+            <ng-template ngbSlide *ngFor="let s of track.liveSnapshotSources">
+                <div class="picsum-img-wrapper">
+                    <img [src]="s.getSnapshotImage+'?width=320'" />
+                </div>
+                <div class="carousel-caption">
+                    <h3>{{s.displayName}}</h3>
+                    <p>{{s.description}}</p>
+                </div>                
+            </ng-template>
+        </ngb-carousel>
         <div class="card-block">
-            <h4>{{vs.displayName}}</h4>
-            <p *ngIf="vs.description != null">{{vs.description}}</p>
-            <a *ngIf="vs.isLive" routerLink="/live-video/{{vs.name}}"><span class="badge badge-success">Live (HLS)</span></a>
-            <a *ngIf="vs.webrtcServers.length &gt; 0" routerLink="/webrtc-video/{{vs.webrtcServers[0].name}}/{{vs.name}}"><span class="badge badge-info">WebRTC</span></a>
-            <span *ngIf="vs.videoTracks.length>0" class="badge badge-info">In {{vs.videoTracks.length}} archive(s)</span>
+            <h4>{{track.displayName}}</h4>
+            <span class="badge badge-info">{{track.channels.length}} video channels</span>
+            <p *ngIf="track.description != null">{{track.description}}</p>
+            <a routerLink="/live-mon/{{track.name}}" role="button" class="btn btn-outline-primary">Мониторинг</a>
         </div>
     </div>
 </div>
