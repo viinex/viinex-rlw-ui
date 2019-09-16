@@ -19,6 +19,7 @@ class WebrtcViewport{
   public sessionId: string;
   public errorMessage: string;
   public viewportVisible: boolean;
+  public sourceName;
 }
 
 @Component({
@@ -163,6 +164,7 @@ export class LiveMonComponent implements OnInit, OnDestroy {
         let vp=this.viewports[k];
         if(!vp.peerConnection){
           vp.viewportVisible=true;
+          this.videoObjectsService.getVideoSource(this.track.channels[k]).subscribe(s => {vp.sourceName=s.displayName;});
           vp.peerConnection=this.createPeerConnection(vp);
           this.webrtcServer.requestOffer(vp.sessionId, this.track.channels[k])
             .subscribe(sdp => {

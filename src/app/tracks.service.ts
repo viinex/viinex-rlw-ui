@@ -84,11 +84,12 @@ export class TracksService {
   public sendRecognize(track: string, recognize: boolean, cookie: number){
     this.http.post(V1SVC_PATH+track, {recognize: recognize, cookie: cookie}).subscribe(r => { 
       let j=r.json();
-      if(j.success) {
+      console.log(r);
+      if(j && j.success) {
         console.debug("sendRecognize succeded at "+track);
       }
       else{
-        console.warn("sendRecognize failed at "+track+": "+j.error);
+        console.warn("sendRecognize failed at "+track, j);
       }
     }, e => {
       console.error("sendRecognize failed at "+track, e);
