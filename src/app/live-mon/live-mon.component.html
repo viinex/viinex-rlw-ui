@@ -3,7 +3,12 @@
 <div class="row">
     <div class="col-4">
         <button class="w-100 btn btn-outline-secondary btn-lg" *ngIf="track &amp;&amp; track.api" 
-            (mousedown)="sendRecognize(true)" (mouseup)="sendRecognize(false)">API управления распознаванием</button>
+            (mousedown)="sendRecognize(true)" (mouseup)="sendRecognize(false)"
+            ngbTooltip="Нажмите эту кнопку для начала распознавания номера вагона, и отпустите для окончания"
+            placement="right"
+            [openDelay]="5000" [closeDelay]="3000">
+            Управление распознаванием
+        </button>
         <div class="shadow w-100">
             <p class="text-monospace mon-rec-result text-center">{{(last_result &amp;&amp; last_result.result) ? last_result.result : "--------"}}</p>
         </div>

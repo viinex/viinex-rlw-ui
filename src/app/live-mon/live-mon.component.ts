@@ -80,6 +80,7 @@ export class LiveMonComponent implements OnInit, OnDestroy {
     for(let vp of this.viewports){
       if(vp && vp.peerConnection){
         vp.peerConnection.close();
+        vp.peerConnection=null;
         this.webrtcServer.dropSession(vp.sessionId).subscribe(r => {
           console.debug("Session "+vp.sessionId+" dropped");
         });
@@ -180,6 +181,7 @@ export class LiveMonComponent implements OnInit, OnDestroy {
       let vp=this.viewports[k];
       if(vp.peerConnection){
         vp.peerConnection.close();
+        vp.peerConnection=null;
         this.webrtcServer.dropSession(vp.sessionId);
         vp.viewport.hidden=true;
         vp.viewportVisible=false;
