@@ -1,1 +1,33 @@
-<p *ngIf="track">{{track.displayName}}</p>
+<a [routerLink]="['/']" routerLinkActive="true" >К главной</a>
+<h2 *ngIf="track">{{track.displayName}} <small>мониторинг в реальном времени</small></h2>
+<div class="row">
+    <div class="col-4">
+        <button class="w-100 btn btn-outline-secondary btn-lg" *ngIf="track &amp;&amp; track.api" 
+            (mousedown)="sendRecognize(true)" (mouseup)="sendRecognize(false)">API управления распознаванием</button>
+        <div class="shadow w-100">
+            <p class="text-monospace mon-rec-result text-center">{{(last_result &amp;&amp; last_result.result) ? last_result.result : "--------"}}</p>
+        </div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th># п/п</th>
+                    <th>Распознанный номер</th>
+                    <th>Уверенность, %</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let res of last_results">
+                    <th scope="row">{{ res ? res.cookie : "---" }}</th>
+                    <td>{{ res ? res.result : "--------" }}</td>
+                    <td>{{ res ? (res.confidence*100 | number : '2.1-1') : "---"}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div> <!--col-3 -->
+    <div class="col-6">
+        <video class="viewport" playsinline [muted]=true controls autoplay width="100%" [hidden]="!(viewports && viewports[0].viewportVisible)"></video>
+    </div>
+    <div class="col-6">
+        <video class="viewport" playsinline [muted]=true controls autoplay width="100%" [hidden]="!(viewports && viewports[1].viewportVisible)"></video>
+    </div>
+</div>

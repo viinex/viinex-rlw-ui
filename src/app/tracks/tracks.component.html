@@ -1,4 +1,4 @@
-<h2>Обслуживаемые пути</h2>
+<h2>Обслуживаемые ЖД пути</h2>
 <div class="card-columns">
     <div *ngFor="let track of tracks" class="card">
             <!--img *ngIf="track.liveSnapshotURIs.length != 0" 
@@ -7,7 +7,7 @@
         <ngb-carousel>
             <ng-template ngbSlide *ngFor="let s of track.liveSnapshotSources">
                 <div class="picsum-img-wrapper">
-                    <img [src]="s.getSnapshotImage+'?width=320'" />
+                    <img class="d-block w-100" [src]="s.getSnapshotImage+'?width=320'" />
                 </div>
                 <div class="carousel-caption">
                     <h3>{{s.displayName}}</h3>
@@ -15,11 +15,12 @@
                 </div>                
             </ng-template>
         </ngb-carousel>
-        <div class="card-block">
+        <div class="card-block p-3">
             <h4>{{track.displayName}}</h4>
-            <span class="badge badge-info">{{track.channels.length}} video channels</span>
+            Видеоканалов: <span class="badge badge-info">{{track.channels.length}}</span>
             <p *ngIf="track.description != null">{{track.description}}</p>
-            <a routerLink="/live-mon/{{track.name}}" role="button" class="btn btn-outline-primary">Мониторинг</a>
+            <a routerLink="/live-mon/{{track.name}}" role="button" class="btn btn-outline-primary">Мониторинг</a>&nbsp;
+            <a routerLink="/history/{{track.name}}" role="button" class="btn btn-outline-secondary">История</a>
         </div>
     </div>
 </div>

@@ -108,8 +108,22 @@ export class WebRTCServer {
 
     public readonly iceServers : Array<any>;
 
-    public requestOffer(sessionId: string, videoSource: VideoSource) : Observable<string>{
-        return this.http.put(V1SVC_PATH+this.name+"/"+sessionId, {live: videoSource.name}).map(res => res.text().replace(/\r\n/g,'\n')+"\n");
+    public requestOffer(sessionId: string, videoSource: VideoSource | string) : Observable<string>{
+        if(typeof videoSource === 'string'){
+            return this.http.put(V1SVC_PATH+this.name+"/"+sessionId, {live: videoSource}).map(res => res.text().replace(/\r\n/g,'\n')+"\n");
+        }
+        else{
+            return this.requestOffer(sessionId, videoSource.name);
+        }
+    }
+    public updateSession(sessionId: string, videoSource: VideoSource | string) : Observable<any>{
+        if(typeof videoSource === 'string'){
+            return this.http.post(V1SVC_PATH+this.name+"/"+sessionId, {live: videoSource}).map(res => res.json());
+        }
+        else{
+            return this.updateSession(sessionId, videoSource.name);
+        }
+        
     }
     public sendAnswer(sessionId: string, sdp: string) : Observable<Response>{
         return this.http.post(V1SVC_PATH+this.name+"/"+sessionId+"/answer", sdp);
