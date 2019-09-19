@@ -48,6 +48,23 @@
                 </div>
             </div>
         </div>
-        {{selectedIndex}}
     </div>
-</div>
+    <div class="col-8" *ngIf="selectedTrain">
+            <div class="card-deck noscroll">
+                <div class="card p-1" *ngFor="let ch of selectedTrain.channels">
+                    <img class="card-img-top" [src]="videoSources[ch].videoTracks[0].getSnapshotImage+'?timestamp='+selectedTrain.timestamp_begin" />
+                    <div class="card-block">
+                        <b>{{videoSources[ch].displayName}}</b> <br/> 
+                        {{selectedTrain.timestamp_begin | date : 'medium'}} -- {{selectedTrain.timestamp_end | date : 'mediumTime'}}
+                        <br/>
+                        <button 
+                            class="btn btn-outline-secondary btn-sm"
+                            (click)="playVideo(ch, selectedTrain.timestamp_begin, selectedTrain.timestamp_end)">Просмотр видео</button>&nbsp;
+                        <a [href]="videoSources[ch].videoTracks[0].getMp4(selectedTrain.timestamp_begin, selectedTrain.timestamp_end)"
+                            class="btn btn-outline-secondary btn-sm"
+                            [download]="selectedTrain.train_number+'_'+ch.video_source+'_'+selectedTrain.timestamp_begin+'.mp4'">Скачать MP4</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

@@ -96,6 +96,7 @@ export class HistoryComponent implements OnInit {
     //let tref=document.getElementsByName('playVideoElement').item(0);
     //console.log(tref);
     let m=this.modalService.open(VideoComponent);
+    m.componentInstance.selectedChannel=this.videoSources[cam];
     m.componentInstance.timestampBegin = begin;
     m.componentInstance.timestampEnd = end;
 
