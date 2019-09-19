@@ -1,5 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, LOCALE_ID } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeRu from '@angular/common/locales/ru';
 
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
@@ -12,6 +14,8 @@ import { VideoObjectsService } from './video-objects.service';
 import { LiveMonComponent } from './live-mon/live-mon.component';
 import { HistoryComponent } from './history/history.component';
 import { VideoComponent } from './history/video/video.component';
+
+registerLocaleData(localeRu, 'ru');
 
 @NgModule({
   declarations: [
@@ -28,7 +32,9 @@ import { VideoComponent } from './history/video/video.component';
     AppRoutingModule,
     NgbModule
   ],
-  providers: [VideoObjectsService],
+  providers: [VideoObjectsService,
+    { provide: LOCALE_ID, useValue: "ru" }
+  ],
   bootstrap: [AppComponent],
   entryComponents:[VideoComponent]
 })
