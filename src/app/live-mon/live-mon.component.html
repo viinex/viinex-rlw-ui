@@ -1,5 +1,5 @@
 <a [routerLink]="['/']" routerLinkActive="true" >К главной</a>
-<h2 *ngIf="track">{{track.displayName}} <small>мониторинг в реальном времени</small></h2>
+<h2 *ngIf="track">{{track.displayName}} <small> :: мониторинг в реальном времени</small></h2>
 <div class="card-columns">
     <div class="card border-0">
         <button class="w-100 btn btn-outline-secondary btn-lg" *ngIf="track &amp;&amp; track.api" 
@@ -16,6 +16,7 @@
             <thead>
                 <tr>
                     <th># п/п</th>
+                    <th># состава</th>
                     <th>Распознанный номер</th>
                     <th>Уверенность, %</th>
                 </tr>
@@ -23,6 +24,7 @@
             <tbody>
                 <tr *ngFor="let res of last_results">
                     <th scope="row">{{ res ? res.cookie : "---" }}</th>
+                    <td>{{ res ? res.train_number : "---" }}</td>
                     <td>{{ res ? res.result : "--------" }}</td>
                     <td>{{ res ? (res.confidence*100 | number : '2.1-1') : "---"}}</td>
                 </tr>
@@ -32,7 +34,7 @@
     <div *ngFor="let k of [0,1,2,3,4]" class="card p-1" [hidden]="!(viewports && viewports[k].viewportVisible)">
         <video class="viewport card-img" playsinline [muted]=true controls autoplay width="100%"></video>
         <div class="card-block p-1">
-            <h5>{{viewports[k].sourceName}}</h5>
+            <h5>{{viewports ? viewports[k].sourceName : ""}}</h5>
         </div>
     </div>
 </div>

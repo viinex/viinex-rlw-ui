@@ -1,0 +1,16 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{selectedChannel.displayName}}</h4>
+    <button type="button" class="close" aria-label="Close" (click)="dismiss()">
+    <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <video id="videoElement" [muted]=true autoplay class="w-100" controls>
+        <source [src]="streamURL"/>
+    </video>
+</div>
+<div class="modal-footer">
+    {{timestampBegin | date:'medium'}} -- {{timestampEnd | date:'mediumTime'}}
+    <!-- <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Save</button> -->
+</div>
+

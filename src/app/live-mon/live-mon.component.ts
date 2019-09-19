@@ -19,7 +19,7 @@ class WebrtcViewport{
   public sessionId: string;
   public errorMessage: string;
   public viewportVisible: boolean;
-  public sourceName;
+  public sourceName: string;
 }
 
 @Component({
@@ -45,6 +45,7 @@ export class LiveMonComponent implements OnInit, OnDestroy {
     private videoObjectsService: VideoObjectsService, private tracksService: TracksService) { 
       this.last_results=new Array<RecResult>(MAX_LAST_RESULTS);
       this.nextCookie=1;
+      this.viewports=null;
   }
 
   ngOnInit() {

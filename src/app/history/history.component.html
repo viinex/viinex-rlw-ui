@@ -1,0 +1,53 @@
+<a [routerLink]="['/']" routerLinkActive="true" >К главной</a>
+<h2 *ngIf="track">{{track.displayName}} <small> :: недавняя история</small></h2>
+<div class="row">
+    <div class="col-4">
+        <table class="table table-striped table-hover tableFixHead">
+            <thead>
+                <tr>
+                    <th># п/п</th>
+                    <th>Распознанный номер</th>
+                    <th>Уверенность, %</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let res of lastResults; let i = index" routerLinkActive="table-primary"
+                (click)="navigateToRailcarIndex(i)">
+                        <th *ngIf="castToRecResult(res)" scope="row">{{ castToRecResult(res).cookie }}</th>
+                        <td *ngIf="castToRecResult(res)">
+                            <a [routerLink]="['/history', track.name]" [queryParams]="{index: i}">
+                                {{ castToRecResult(res).result }}
+                            </a>
+                        </td>
+                        <td *ngIf="castToRecResult(res)">{{ castToRecResult(res).confidence*100 | number : '2.1-1' }}</td>
+
+                        <th *ngIf="castToTrainInfo(res)" scope="row" colspan="3">
+                            Состав <a [routerLink]="['/history', track.name]" [queryParams]="{index: i}">#{{castToTrainInfo(res).train_number}}</a>
+                        </th>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-8" *ngIf="selectedResult">
+        <div class="card-deck noscroll">
+            <div class="card p-1" *ngFor="let ch of selectedResult.channels">
+                <img class="card-img-top" [src]="videoSources[ch.video_source].videoTracks[0].getSnapshotImage+'?timestamp='+ch.timestamps.best" />
+                <div class="card-block">
+                    <b>{{videoSources[ch.video_source].displayName}}</b> &nbsp; {{ch.timestamps.best | date : 'medium'}}
+                    <br/>
+                    <button 
+                        class="btn btn-outline-secondary btn-sm"
+                        (click)="playVideo(ch.video_source, ch.timestamps.first, ch.timestamps.last)">Просмотр видео</button>&nbsp;
+                    <a [href]="videoSources[ch.video_source].videoTracks[0].getSnapshotImage+'?timestamp='+ch.timestamps.best"
+                        class="btn btn-outline-secondary btn-sm"
+                        [download]="selectedResult.result+'_'+ch.video_source+'_'+ch.timestamps.best+'.jpg'">Скачать JPEG</a>&nbsp;
+                    <a [href]="videoSources[ch.video_source].videoTracks[0].getMp4(ch.timestamps.first, ch.timestamps.last)"
+                        class="btn btn-outline-secondary btn-sm"
+                        [download]="selectedResult.result+'_'+ch.video_source+'_'+ch.timestamps.first+'.mp4'">Скачать MP4</a>
+                    
+                </div>
+            </div>
+        </div>
+        {{selectedIndex}}
+    </div>
+</div>

@@ -104,7 +104,6 @@ export class VideoObjectsService {
         vo.videoArchives=va;
         vo.webrtcServers=wr;
         vo.meta=bodyMeta;
-        console.log(vo.meta);
         return vo;
     }
     private static extractLiveStreamDetails(res: Response){

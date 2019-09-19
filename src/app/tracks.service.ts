@@ -30,11 +30,32 @@ export class ChanInfo{
 
 export class RecResult{
   public track: string;
+  public train_number: number;
   public result: string;
   public confidence: number;
   public cookie: number;
   public channels: Array<ChanInfo>;
+  public timestamp_begin?: number;
+  public timestamp_end?: number;
 
+  public constructor(x: any){
+    this.track=x.track;
+    this.train_number=x.train_number;
+    this.result=x.result;
+    this.confidence=x.confidence;
+    this.cookie=x.cookie;
+    this.channels=x.channels;
+    this.timestamp_begin=Math.min(...x.channels.map(c => c.timestamps.first));
+    this.timestamp_end=Math.min(...x.channels.map(c => c.timestamps.last));
+  }
+}
+
+export class TrainInfo{
+  public track: string;
+  public train_number: number;
+  public channels: Array<string>;
+  public timestamp_begin: number;
+  public timestamp_end: number;
 }
 
 @Injectable({
@@ -78,7 +99,7 @@ export class TracksService {
   public trackResults(trackName: string): Observable<RecResult> {
     return this.videoObjectsService.webSocket
     .filter(x => x.topic=="RailcarNumberRecognition" && x.data.track==trackName)
-    .map(x => x.data);
+    .map(x => new RecResult(x.data));
   }
 
   public sendRecognize(track: string, recognize: boolean, cookie: number){
@@ -94,5 +115,44 @@ export class TracksService {
     }, e => {
       console.error("sendRecognize failed at "+track, e);
     });
+  }
+  public getHistory(track: string): Observable<Array<RecResult>>{
+    return this.http.get(V1SVC_PATH+track).map(r => {
+      let rr = [];
+      let j=r.json();
+      for(let x of j.last_railcars){
+        if(x.train_number != j.train_number){ // берем все вагоны кроме относящихся к текущему составу
+          rr.push(new RecResult(x));
+        }
+      }
+      return rr;
+    });
+  }
+
+  public static produceTrains(track: TrackInfo, rr: Array<RecResult>): Array<RecResult | TrainInfo>{
+    let res=new Array<RecResult | TrainInfo>();
+    let ti : TrainInfo = null;
+    for(let k=rr.length-1; k>=0; --k){
+      let r = rr[k];
+      if(ti == null || ti.train_number != r.train_number){
+        if(ti){
+          res.push(ti);
+        }
+        ti=new TrainInfo();
+        ti.track=track.name;
+        ti.train_number=r.train_number;
+        ti.channels=track.channels;
+        ti.timestamp_end=r.timestamp_end;
+        ti.timestamp_begin=r.timestamp_begin;
+      }
+      else{
+        ti.timestamp_begin=r.timestamp_begin;
+      }
+      res.push(r);
+    }
+    if(ti){
+      res.push(ti);
+    }
+    return res.reverse();
   }
 }

@@ -10,13 +10,17 @@ import { TracksComponent } from './tracks/tracks.component';
 import { HttpModule } from '@angular/http';
 import { VideoObjectsService } from './video-objects.service';
 import { LiveMonComponent } from './live-mon/live-mon.component';
+import { HistoryComponent } from './history/history.component';
+import { VideoComponent } from './history/video/video.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NotFoundComponent,
     TracksComponent,
-    LiveMonComponent
+    LiveMonComponent,
+    HistoryComponent,
+    VideoComponent
   ],
   imports: [
     BrowserModule,
@@ -25,6 +29,7 @@ import { LiveMonComponent } from './live-mon/live-mon.component';
     NgbModule
   ],
   providers: [VideoObjectsService],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents:[VideoComponent]
 })
 export class AppModule { }

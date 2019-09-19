@@ -37,8 +37,19 @@ export class LiveStreamDetails {
 }
 
 export class VideoTrack {
-    constructor(public videoSource: VideoSource, public videoArchive: VideoArchive){}
+    public readonly getSnapshotImage : string;
+    constructor(public videoSource: VideoSource, public videoArchive: VideoArchive){
+        this.getSnapshotImage=V1SVC_PATH+videoArchive.name+"/"+videoSource.name+"/"+"snapshot";
+    }
     getTrackData: () => Observable<VideoTrackData>;
+    getMp4(begin: number, end: number){
+        return V1SVC_PATH+this.videoArchive.name+"/"+this.videoSource.name+"/"+"export?format=isom"
+        +"&begin="+begin+"&end="+end;
+    }
+    getHls(begin: number, end: number){
+        return V1SVC_PATH+this.videoArchive.name+"/"+this.videoSource.name+"/"+"stream.m3u8"
+        +"?begin="+begin+"&end="+end;
+    }
 }
 
 export class VideoTrackSummary {

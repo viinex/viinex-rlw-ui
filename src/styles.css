@@ -2,3 +2,13 @@
 .mon-rec-result {
     font-size: 6vw;
 }
+.h-scroll {
+    height: 93vh; /* %-height of the viewport */
+    position: fixed;
+    overflow-y: scroll;
+}
+.noscroll {
+    position: sticky; top: 10px; 
+}
+.tableFixHead          { overflow-y: auto; height: 100px; }
+.tableFixHead thead th { position: sticky; top: 0; background-color: #FFF; }
