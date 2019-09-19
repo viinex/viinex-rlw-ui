@@ -91,10 +91,15 @@ export class HistoryComponent implements OnInit {
     }
   }
 
+  public supplementaryChannels(r: RecResult) : Array<string>{
+    let rc=r.channels.map(c => c.video_source);
+    return this.track.channels.filter(c => !rc.includes(c));
+  }
+
   public playVideo(cam: string, begin: number, end: number){
     //let tref=document.getElementsByName('playVideoElement').item(0);
     //console.log(tref);
-    let m=this.modalService.open(VideoComponent);
+    let m=this.modalService.open(VideoComponent, {size:'lg'});
     m.componentInstance.selectedChannel=this.videoSources[cam];
     m.componentInstance.timestampBegin = begin;
     m.componentInstance.timestampEnd = end;
