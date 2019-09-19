@@ -84,7 +84,6 @@ export class HistoryComponent implements OnInit {
   }
   public castToTrainInfo(r: any){
     if (r instanceof TrainInfo){
-      console.log(r as TrainInfo);
       return r as TrainInfo;
     }
     else {

@@ -44,9 +44,9 @@ export class RecResult{
     this.result=x.result;
     this.confidence=x.confidence;
     this.cookie=x.cookie;
-    this.channels=x.channels;
-    this.timestamp_begin=Math.min(...x.channels.map(c => c.timestamps.first));
-    this.timestamp_end=Math.min(...x.channels.map(c => c.timestamps.last));
+    this.channels=x.channels.filter(c => c.timestamps != null);
+    this.timestamp_begin=Math.min(...this.channels.map(c => c.timestamps.first));
+    this.timestamp_end=Math.max(...this.channels.map(c => c.timestamps.last));
   }
 }
 

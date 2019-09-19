@@ -21,9 +21,10 @@
                         </td>
                         <td *ngIf="castToRecResult(res)">{{ castToRecResult(res).confidence*100 | number : '2.1-1' }}</td>
 
-                        <th *ngIf="castToTrainInfo(res)" scope="row" colspan="3">
-                            Состав <a [routerLink]="['/history', track.name]" [queryParams]="{index: i}">#{{castToTrainInfo(res).train_number}}</a>
-                        </th>
+                        <td *ngIf="castToTrainInfo(res)" colspan="3">
+                            <b>Состав <a [routerLink]="['/history', track.name]" [queryParams]="{index: i}">#{{castToTrainInfo(res).train_number}}</a></b>,
+                            {{castToTrainInfo(res).timestamp_begin | date: 'medium'}}
+                        </td>
                 </tr>
             </tbody>
         </table>
