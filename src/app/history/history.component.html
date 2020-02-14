@@ -32,16 +32,16 @@
     <div class="col-8" *ngIf="selectedResult">
         <div class="card-deck noscroll">
             <div class="card p-1 mb-2 histcard" *ngFor="let ch of selectedResult.channels">
-                <img class="card-img-top" [src]="videoSources[ch.video_source].videoTracks[0].getSnapshotImage+'?timestamp='+ch.timestamps.best" />
+                <img class="card-img-top" [src]="videoSources[ch.video_source].videoTracks[0].getSnapshotImage+'?timestamp='+ch.timestamps.show" />
                 <div class="card-block">
                     <b>{{videoSources[ch.video_source].displayName}}</b> &nbsp; {{ch.timestamps.best | date : 'medium'}}
                     <br/>
                     <button 
                         class="btn btn-outline-secondary btn-sm"
                         (click)="playVideo(ch.video_source, ch.timestamps.first, ch.timestamps.last)">Просмотр видео</button>&nbsp;
-                    <a [href]="videoSources[ch.video_source].videoTracks[0].getSnapshotImage+'?timestamp='+ch.timestamps.best"
+                    <a [href]="videoSources[ch.video_source].videoTracks[0].getSnapshotImage+'?timestamp='+ch.timestamps.show"
                         class="btn btn-outline-secondary btn-sm"
-                        [download]="selectedResult.result+'_'+ch.video_source+'_'+ch.timestamps.best+'.jpg'">Скачать JPEG</a>&nbsp;
+                        [download]="selectedResult.result+'_'+ch.video_source+'_'+ch.timestamps.show+'.jpg'">Скачать JPEG</a>&nbsp;
                     <a [href]="videoSources[ch.video_source].videoTracks[0].getMp4(ch.timestamps.first, ch.timestamps.last)"
                         class="btn btn-outline-secondary btn-sm"
                         [download]="selectedResult.result+'_'+ch.video_source+'_'+ch.timestamps.first+'.mp4'">Скачать MP4</a>

@@ -20,6 +20,7 @@ export class Timestamps{
   public best?: number;
   public first: number;
   public last: number;
+  public show: number;
 }
 
 export class ChanInfo{
@@ -47,6 +48,14 @@ export class RecResult{
     this.channels=x.channels.filter(c => c.timestamps != null);
     this.timestamp_begin=Math.min(...this.channels.map(c => c.timestamps.first));
     this.timestamp_end=Math.max(...this.channels.map(c => c.timestamps.last));
+    for(let ci of this.channels){
+      if(ci.timestamps.best){
+        ci.timestamps.show=ci.timestamps.best;
+      }
+      else{
+        ci.timestamps.show = Math.round((ci.timestamps.last + ci.timestamps.first)/2);
+      }
+    }
   }
 }
 
