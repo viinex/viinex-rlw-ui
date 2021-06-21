@@ -1,5 +1,68 @@
+<div class="container">
 <a [routerLink]="['/']" routerLinkActive="true" >К главной</a>
-<h2 *ngIf="track">{{track.displayName}} <small> :: недавняя история</small></h2>
+<div class="row">
+    <div class="col-12">
+        <h2 *ngIf="track">{{track.displayName}}<small *ngIf="!haveEventsArchive"> :: недавняя история</small>
+        <small *ngIf="haveEventsArchive"> :: 
+            <a type="button" (click)="isSearchCollapsed = !isSearchCollapsed" class="queryparams">
+            с {{ searchBegin | date : 'shortDate' }} по {{ searchEnd | date : 'shortDate' }} 
+            </a>
+        </small>
+        </h2>
+    </div>
+</div>
+<div #collapse="ngbCollapse" [(ngbCollapse)]="isSearchCollapsed">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Параметры поиска</h5>
+            <div class="card-text">
+                <div class="col-4">
+                    <ngb-datepicker #dp (select)="onDateSelection($event)" [displayMonths]="2" [dayTemplate]="dayTemplate" outsideDays="hidden">
+                    </ngb-datepicker>
+                    
+                    <ng-template #dayTemplate let-date let-focused="focused">
+                    <span class="custom-day"
+                            [class.focused]="focused"
+                            [class.range]="isRange(date)"
+                            [class.faded]="isHovered(date) || isInside(date)"
+                            (mouseenter)="hoveredDate = date"
+                            (mouseleave)="hoveredDate = null">
+                        {{ date.day }}
+                    </span>
+                    </ng-template>
+                </div>
+                <p>
+                <div class="col-4">
+                    Записей на странице: 
+                    <div class="btn-group btn-group-toggle" ngbRadioGroup name="radioBasic" [(ngModel)]="recordsPerPage">
+                        <label ngbButtonLabel class="btn-primary">
+                          <input ngbButton type="radio" [value]="200">200
+                        </label>
+                        <label ngbButtonLabel class="btn-primary">
+                          <input ngbButton type="radio" [value]="1000">1000
+                        </label>
+                        <label ngbButtonLabel class="btn-primary">
+                          <input ngbButton type="radio" [value]="5000">5000
+                        </label>
+                        <label ngbButtonLabel class="btn-primary">
+                          <input ngbButton type="radio" [value]="25000">25000
+                        </label>
+                    </div>                    
+                </div>
+            </div>
+            <div>
+                <p>
+                <hr/>
+                <button type="button" class="btn btn-primary" (click)="getHistory(); isSearchCollapsed=true" [disabled]="!(searchBegin && searchEnd)">Применить</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row" [hidden]="!isSearchCollapsed || (totalRecords &lt; recordsPerPage)">
+    <div class="col-12">
+        <ngb-pagination [collectionSize]="totalRecords" [(page)]="currentPage" [pageSize]="recordsPerPage" [directionLinks]="false" (pageChange)="getHistory()"></ngb-pagination>
+    </div>
+</div>
 <div class="row">
     <div class="col-4">
         <table class="table table-striped table-hover tableFixHead">
@@ -80,4 +143,5 @@
             </div>
         </div>
     </div>
+</div>
 </div>

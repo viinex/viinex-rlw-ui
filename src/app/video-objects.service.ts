@@ -19,6 +19,7 @@ import {
     VideoTrackData, 
     VideoTrackSummary,
     LiveStreamDetails,
+    EventArchive,
     WebRTCServer,
     WebRTCServerSummary,
     V1SVC_PATH
@@ -66,6 +67,7 @@ export class VideoObjectsService {
         let vs=new Array<VideoSource>();
         let va=new Array<VideoArchive>();
         let wr=new Array<WebRTCServer>();
+        let ea=new Array<EventArchive>();
         for(let tn of body){
             let [t,n]=tn;
             switch(t){
@@ -98,11 +100,17 @@ export class VideoObjectsService {
                     wr.push(w);
                     break;
                 }
+                case "EventArchive": {
+                    let a = new EventArchive(http, n, bodyMeta[n]);
+                    ea.push(a);
+                    break;
+                }
             }
         }
         vo.videoSources=vs;
         vo.videoArchives=va;
         vo.webrtcServers=wr;
+        vo.eventArchives=ea;
         vo.meta=bodyMeta;
         return vo;
     }

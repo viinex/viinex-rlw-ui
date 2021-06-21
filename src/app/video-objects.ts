@@ -1,5 +1,6 @@
 import { Observable } from 'rxjs';
 import { Http, Response } from '@angular/http';
+import { stringify } from '@angular/compiler/src/util';
 
 export const V1SVC_PATH = location.origin + "/v1/svc/";
 
@@ -149,10 +150,77 @@ export class WebRTCServerSummary {
     live: Array<string>;
 }
 
+export class EventArchiveSummaryEntry {
+    constructor(public origin: string, public topic: string, public count: number){}
+}
+
+export class EventArchiveSummary extends Array<EventArchiveSummaryEntry> {}
+
+export class EventOrigin {
+    name: string;
+    type: string;
+    details: object;
+}
+
+export class EventDesc {
+    topic: string;
+    origin: EventOrigin;
+    timestamp: Date;
+    data: object;
+}
+
+export class EventArchive {
+    constructor(private http: Http, public name: string, public metaData: any){
+    }
+    public getSummary(begin?: Date, end?: Date) : Observable<EventArchiveSummary>{
+        return this.http.get(V1SVC_PATH+this.name+"/summary"+EventArchive.queryParams(begin,end)).map(
+            (res: Response) => {
+                let body=<EventArchiveSummary>res.json();
+                return body;
+            }
+        );
+    }
+    public getEvents(begin?: Date, end?: Date, topics?: Array<string>, origins?: Array<string>, limit?: number, offset? : number) : Observable<Array<EventDesc>>{
+        return this.http.get(V1SVC_PATH+this.name+EventArchive.queryParams(begin,end, topics, origins, limit, offset))
+            .map((res: Response) => <Array<EventDesc>>res.json());
+    }
+    private static queryParams(begin?: Date, end?: Date, topics?: Array<string>, origins?: Array<string>, limit?: number, offset? : number) : string {
+        let p = [];
+        if(begin!=null){
+            p.push("begin="+begin.toISOString());
+        }
+        if(end!=null){
+            p.push("end="+end.toISOString());
+        }
+        if(topics!=null){
+            p.push("topic="+topics.join(","));
+        }
+        if(origins!=null){
+            p.push("origin="+origins.join(","));
+        }
+        if(Number.isFinite(limit)){
+            p.push("limit="+limit.toString());
+            if(Number.isFinite(offset)){
+                p.push("offset="+offset.toString());
+            }
+            else{
+                p.push("offset=0");
+            }
+        }
+        if(p.length > 0){
+            return "?"+p.join("&");
+        }
+        else{
+            return "";
+        }
+    }
+}
+
 export class VideoObjects {
     videoSources: Array<VideoSource>;
     videoArchives: Array<VideoArchive>;
     webrtcServers: Array<WebRTCServer>;
+    eventArchives: Array<EventArchive>;
     meta : Map<string, any>;
 }
 

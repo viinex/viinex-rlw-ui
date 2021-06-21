@@ -125,7 +125,7 @@ export class TracksService {
       console.error("sendRecognize failed at "+track, e);
     });
   }
-  public getHistory(track: string): Observable<Array<RecResult>>{
+  public getHistoryFromScript(track: string): Observable<Array<RecResult>>{
     return this.http.get(V1SVC_PATH+track).map(r => {
       let rr = [];
       let j=r.json();
@@ -135,6 +135,33 @@ export class TracksService {
         }
       }
       return rr;
+    });
+  }
+
+  public getHistory(track: string, begin: Date, end: Date, recordsPerPage?: number, currentPage?: number) : Observable<Array<RecResult>>{
+    return this.videoObjectsService.getObjects().mergeMap(objs => {
+      if(objs.eventArchives.length>0){
+        return objs.eventArchives[0].getEvents(begin,end,["RailcarNumberRecognition"],[track], recordsPerPage, (currentPage-1)*recordsPerPage)
+          .map(a => a.map(x => new RecResult(x.data)));
+      }
+      else {
+        return this.getHistoryFromScript(track);
+      }
+    });
+  }
+  public haveEventsArchive() : Observable<boolean>{
+    return this.videoObjectsService.getObjects().map(objs => objs.eventArchives.length>0);
+  }
+  public getSummary(track: string, begin?: Date, end?: Date) : Observable<number>{
+    return this.videoObjectsService.getObjects().mergeMap(objs => {
+      if(objs.eventArchives.length>0){
+        return objs.eventArchives[0].getSummary(begin,end).map(
+          s => s.filter(x => x.origin==track && x.topic=="RailcarNumberRecognition").map(x => x.count).reduce((p,c) => p+c)
+        );
+      }
+      else{
+        return this.getHistoryFromScript(track).map(h => h.length);
+      }
     });
   }
 
