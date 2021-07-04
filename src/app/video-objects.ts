@@ -198,7 +198,7 @@ export class EventArchive {
         if(origins!=null){
             p.push("origin="+origins.join(","));
         }
-        if(Number.isFinite(limit)){
+        if(isFinite(limit) && (limit > 0)){
             p.push("limit="+limit.toString());
             if(Number.isFinite(offset)){
                 p.push("offset="+offset.toString());

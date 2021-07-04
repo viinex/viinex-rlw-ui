@@ -1,16 +1,17 @@
 import { Component, OnInit, TemplateRef, Query } from '@angular/core';
 
-import { ActivatedRoute,Router }       from '@angular/router';
+import { ActivatedRoute,Router,Params }       from '@angular/router';
 
 import {VideoObjectsService} from '../video-objects.service'
-import {TracksService,TrackInfo, RecResult, ChanInfo,Timestamps,TrainInfo} from '../tracks.service'
+import {TracksService,TrackInfo, RecResult, ChanInfo,Timestamps,TrainInfo, HistoryData} from '../tracks.service'
 import { VideoSource } from '../video-objects';
 import {VideoComponent} from './video/video.component';
 
 import {NgbModal, NgbCollapse, NgbDate, NgbCalendar, NgbDateNativeAdapter, NgbDateStruct} from '@ng-bootstrap/ng-bootstrap';
 
 import { Observable } from "rxjs/Observable";
-import 'rxjs/add/operator/zip'
+import { combineLatest } from 'rxjs';
+
 import { hasLifecycleHook } from '@angular/compiler/src/lifecycle_reflector';
 
 
@@ -20,9 +21,10 @@ import { hasLifecycleHook } from '@angular/compiler/src/lifecycle_reflector';
   styleUrls: ['./history.component.css']
 })
 export class HistoryComponent implements OnInit {
-  public track: TrackInfo;
+  public track: TrackInfo = null;
   public videoSources: Map<string, VideoSource>;
 
+  public historyData: HistoryData = null;
   public lastResults: Array<RecResult | TrainInfo>;
 
   public selectedTrack : string;
@@ -59,6 +61,8 @@ export class HistoryComponent implements OnInit {
       this.searchBegin=new Date(this.searchEnd.valueOf() - 24*60*60);
       this.searchNumber="";
       this.searchDistance=0;
+      this.recordsPerPage=1000;
+      this.currentPage=1;
 
       this.isSearchCollapsed = true;
 
@@ -68,36 +72,113 @@ export class HistoryComponent implements OnInit {
   private dateAdapter: NgbDateNativeAdapter = new NgbDateNativeAdapter();
 
   public navigateToRailcarIndex(i: number){
-    this.router.navigate(['/history', this.track.name], {queryParams: {index: i}});
+    //this.router.navigate(['/history', this.track.name], {queryParams: {index: i}});
+    this.navigateTo(this.track.name, i);
   }
+  public navigateTo(track: string, index?: number, page?: number, pageSize?: number, begin?: Date, end?: Date){
+    let endf = end ? new Date(end) : (this.searchEnd? new Date(this.searchEnd) : new Date());
+    let beginf = (end && begin) ? new Date(begin) : (this.searchEnd && this.searchBegin ? new Date(this.searchBegin) : new Date(endf.valueOf() - 24*60*60));
+    let pagef = (isFinite(page) && (page > 0)) ? page : (isFinite(this.currentPage) && (this.currentPage>0) ? this.currentPage : 1);
+    let pageSizef = (isFinite(pageSize) && (pageSize > 0)) ? pageSize : (isFinite(this.recordsPerPage) && (this.recordsPerPage>0) ? this.recordsPerPage : 1000);
+
+    let qp = {
+      begin: beginf.toISOString(),
+      end: endf.toISOString(),
+      pageSize: pageSizef,
+      page: pagef,
+      index: index
+    };
+    console.log("navigateTo: qp=", qp);
+
+    this.router.navigate(["/history", track], {queryParams: qp});
+  }
+  public navigate(){
+    console.log("naviagate", this.selectedTrack, this.currentPage, this.recordsPerPage, this.searchBegin, this.searchEnd);
+    this.navigateTo(this.selectedTrack, 0, this.currentPage, this.recordsPerPage, this.searchBegin, this.searchEnd);
+  }
+
+  public updateModelToLocation(params: Params, queryParams: Params){
+    console.log("updateModelToLocation",params, queryParams);
+    this.selectedTrack = params["track"];
+    this.currentPage = queryParams["page"];
+    this.recordsPerPage = queryParams["pageSize"];
+    this.searchBegin = new Date(queryParams["begin"]);
+    this.searchEnd = new Date(queryParams["end"]);
+    this.selectedIndex=queryParams["index"];
+
+    console.log("updateModelToLocation", this.selectedTrack, this.currentPage, this.recordsPerPage, this.searchBegin, this.searchEnd);
+    if(this.historyData){
+      console.log("this.historyData",this.historyData.track, this.historyData.searchBegin, this.historyData.searchEnd, this.historyData.currentPage, this.historyData.recordsPerPage);
+      console.log(this.historyData.track != this.selectedTrack);
+      console.log(this.historyData.searchBegin.valueOf() != this.searchBegin.valueOf());
+      console.log(this.historyData.searchEnd.valueOf() != this.searchEnd.valueOf());
+      console.log(this.historyData.currentPage != this.currentPage);
+      console.log(this.historyData.recordsPerPage != this.recordsPerPage);
+    }
+
+    let shouldUpdateModel : boolean = false ||
+      (this.historyData == null) ||
+      (this.historyData.track != this.selectedTrack) ||
+      (this.historyData.searchBegin.valueOf() != this.searchBegin.valueOf()) ||
+      (this.historyData.searchEnd.valueOf() != this.searchEnd.valueOf()) ||
+      (this.historyData.currentPage != this.currentPage) ||
+      (this.historyData.recordsPerPage != this.recordsPerPage);
+
+    console.log("sohouldUPdateModel=",shouldUpdateModel);
+
+    if(shouldUpdateModel){
+      this.videoObjectsService.getObjects().subscribe(vo => {
+        console.log(params,queryParams);
+        this.tracksService.getTrack(this.selectedTrack).subscribe(track => { 
+          this.track=track;
+          this.videoSources=new Map<string, VideoSource>();
+
+          for(let s of track.channels){
+            let vs=vo.videoSources.find(vs => vs.name==s);
+            if(vs){
+              this.videoSources[s]=vs;
+            }
+          }
+          this.getSummary();
+          this.getHistory();
+        });
+      });
+    }
+    else{
+      console.log("historyData:", this.historyData);
+      console.log("lastResults:", this.lastResults);
+      console.log("selectedIndex: ", this.selectedIndex);
+      this.selectedResult=this.castToRecResult(this.lastResults[this.selectedIndex]);
+      this.selectedTrain=this.castToTrainInfo(this.lastResults[this.selectedIndex]);
+      console.log("selectedResult=",this.selectedResult);
+      console.log("selectedTrain=",this.selectedTrain);
+    }
+
+  }
+
   ngOnInit() {
     console.log("oninit");
     this.tracksService.haveEventsArchive().subscribe( (v) => { 
       console.log(v);
-      this.haveEventsArchive = v; });
-    this.route.queryParams.subscribe(qp =>{
-      this.selectedIndex=qp["index"];
-      if(this.lastResults){
-        this.selectedResult=this.castToRecResult(this.lastResults[this.selectedIndex]);
-        this.selectedTrain=this.castToTrainInfo(this.lastResults[this.selectedIndex]);
+      this.haveEventsArchive = v; 
+      if(!this.haveEventsArchive){
+        this.route.queryParams.subscribe(qp =>{
+          this.selectedIndex=qp["index"];
+          if(this.lastResults){
+            this.selectedResult=this.castToRecResult(this.lastResults[this.selectedIndex]);
+            this.selectedTrain=this.castToTrainInfo(this.lastResults[this.selectedIndex]);
+          }
+        });
       }
-    });
-    this.route.params.subscribe(params => {
-      let selectedTrack=params["track"];
-      if(this.track==null || this.track.name != selectedTrack){
-        this.videoObjectsService.getObjects().subscribe(vo => {
-          this.tracksService.getTrack(params["track"]).subscribe(track => { 
-            this.track=track;
-            this.videoSources=new Map<string, VideoSource>();
-            for(let s of track.channels){
-              let vs=vo.videoSources.find(vs => vs.name==s);
-              if(vs){
-                this.videoSources[s]=vs;
-              }
-            }
-            this.getSummary();
-            this.getHistory();
-          });
+      else{
+        combineLatest(this.route.params, this.route.queryParams).subscribe((p) => {
+          let [params, queryParams] = p;
+          if(queryParams["end"] && queryParams["begin"]){
+            this.updateModelToLocation(params, queryParams);
+          }
+          else{
+            this.navigateTo(params["track"]);
+          }
         });
       }
     });
@@ -152,11 +233,19 @@ export class HistoryComponent implements OnInit {
   //end datepicker stuff
 
   public getSummary(){
+    if(this.track == null || this.searchBegin==null || this.searchEnd==null){
+      return;
+    }
     this.tracksService.getSummary(this.track.name, new Date(this.searchBegin), new Date(this.searchEnd)).subscribe(r => { this.totalRecords = r; console.log(r); });
   }
   public getHistory(){
-    this.tracksService.getHistory(this.track.name, new Date(this.searchBegin), new Date(this.searchEnd), this.recordsPerPage, this.currentPage).subscribe(r => {
-      this.lastResults=TracksService.produceTrains(this.track, r);
+    if(this.track == null || this.searchBegin==null || this.searchEnd==null){
+      return;
+    }
+    this.tracksService.getHistory(this.track.name, new Date(this.searchBegin), new Date(this.searchEnd), this.recordsPerPage, this.currentPage).subscribe(h => {
+      this.historyData=h;
+      this.lastResults=TracksService.produceTrains(this.track, this.historyData.results);
+      console.log("got history", this.lastResults);
       if(this.selectedIndex >= 0){
         this.selectedResult=this.castToRecResult(this.lastResults[this.selectedIndex]);
         this.selectedTrain=this.castToTrainInfo(this.lastResults[this.selectedIndex]);
@@ -201,4 +290,7 @@ export class HistoryComponent implements OnInit {
     });
   }
 
+  public onImgError(event){
+    event.target.src='./assets/novideo.png';
+  }
 }

@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container-fluid">
 <a [routerLink]="['/']" routerLinkActive="true" >К главной</a>
 <div class="row">
     <div class="col-12">
@@ -11,7 +11,8 @@
         </h2>
     </div>
 </div>
-<div #collapse="ngbCollapse" [(ngbCollapse)]="isSearchCollapsed">
+<div class="row">
+<div #searchParams="ngbCollapse" [ngbCollapse]="isSearchCollapsed" class="col-6">
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">Параметры поиска</h5>
@@ -32,7 +33,7 @@
                     </ng-template>
                 </div>
                 <p>
-                <div class="col-4">
+                <div class="col-12">
                     Записей на странице: 
                     <div class="btn-group btn-group-toggle" ngbRadioGroup name="radioBasic" [(ngModel)]="recordsPerPage">
                         <label ngbButtonLabel class="btn-primary">
@@ -53,14 +54,18 @@
             <div>
                 <p>
                 <hr/>
-                <button type="button" class="btn btn-primary" (click)="getHistory(); isSearchCollapsed=true" [disabled]="!(searchBegin && searchEnd)">Применить</button>
+                <button type="button" class="btn btn-primary" (click)="navigate(); isSearchCollapsed=true;" [disabled]="!(searchBegin && searchEnd)">Применить</button>
             </div>
         </div>
     </div>
 </div>
-<div class="row" [hidden]="!isSearchCollapsed || (totalRecords &lt; recordsPerPage)">
+</div>
+<div class="row" [hidden]="(isSearchCollapsed != true) || (totalRecords &lt; recordsPerPage)">
     <div class="col-12">
-        <ngb-pagination [collectionSize]="totalRecords" [(page)]="currentPage" [pageSize]="recordsPerPage" [directionLinks]="false" (pageChange)="getHistory()"></ngb-pagination>
+        <ngb-pagination [collectionSize]="totalRecords" 
+            [(page)]="currentPage" [pageSize]="recordsPerPage" 
+            [maxSize]="25" [ellipses]="true"
+            [directionLinks]="true" (pageChange)="navigate()"></ngb-pagination>
     </div>
 </div>
 <div class="row">
@@ -74,18 +79,19 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let res of lastResults; let i = index" routerLinkActive="table-primary"
+                <tr *ngFor="let res of lastResults; let i = index" 
+                [ngClass]="{'table-primary': i==this.selectedIndex}"
                 (click)="navigateToRailcarIndex(i)">
                         <th *ngIf="castToRecResult(res)" scope="row">{{ castToRecResult(res).cookie }}</th>
                         <td *ngIf="castToRecResult(res)">
-                            <a [routerLink]="['/history', track.name]" [queryParams]="{index: i}">
+                            <a (click)="navigateToRailcarIndex(i)">
                                 {{ castToRecResult(res).result }}
                             </a>
                         </td>
                         <td *ngIf="castToRecResult(res)">{{ castToRecResult(res).confidence*100 | number : '2.1-1' }}</td>
 
                         <td *ngIf="castToTrainInfo(res)" colspan="3">
-                            <b>Состав <a [routerLink]="['/history', track.name]" [queryParams]="{index: i}">#{{castToTrainInfo(res).train_number}}</a></b>,
+                            <b>Состав <a (click)="navigateToRailcarIndex(i)">#{{castToTrainInfo(res).train_number}}</a></b>,
                             {{castToTrainInfo(res).timestamp_begin | date: 'medium'}}
                         </td>
                 </tr>
@@ -95,7 +101,8 @@
     <div class="col-8" *ngIf="selectedResult">
         <div class="card-deck noscroll">
             <div class="card p-1 mb-2 histcard" *ngFor="let ch of selectedResult.channels">
-                <img class="card-img-top" [src]="videoSources[ch.video_source].videoTracks[0].getSnapshotImage+'?timestamp='+ch.timestamps.show" />
+                <img class="card-img-top" [src]="videoSources[ch.video_source].videoTracks[0].getSnapshotImage+'?timestamp='+ch.timestamps.show" 
+                    (error)="onImgError($event)"/>
                 <div class="card-block">
                     <b>{{videoSources[ch.video_source].displayName}}</b> &nbsp; {{ch.timestamps.best | date : 'medium'}}
                     <br/>
@@ -112,7 +119,8 @@
             </div>
 
             <div class="card p-1 mb-2 histcard" *ngFor="let ch of supplementaryChannels(selectedResult)">
-                <img class="card-img-top" [src]="videoSources[ch].videoTracks[0].getSnapshotImage+'?timestamp='+selectedResult.timestamp_begin" />
+                <img class="card-img-top" [src]="videoSources[ch].videoTracks[0].getSnapshotImage+'?timestamp='+selectedResult.timestamp_begin" 
+                    (error)="onImgError($event)"/>
                 <div class="card-block">
                     <b>{{videoSources[ch].displayName}}</b> <br/>
                     <button 
@@ -128,7 +136,8 @@
     <div class="col-8" *ngIf="selectedTrain">
         <div class="card-deck noscroll">
             <div class="card p-1 mb-2 histcard" *ngFor="let ch of selectedTrain.channels">
-                <img class="card-img-top" [src]="videoSources[ch].videoTracks[0].getSnapshotImage+'?timestamp='+selectedTrain.timestamp_begin" />
+                <img class="card-img-top" [src]="videoSources[ch].videoTracks[0].getSnapshotImage+'?timestamp='+selectedTrain.timestamp_begin"
+                    (error)="onImgError($event)" />
                 <div class="card-block">
                     <b>{{videoSources[ch].displayName}}</b> <br/> 
                     {{selectedTrain.timestamp_begin | date : 'medium'}} -- {{selectedTrain.timestamp_end | date : 'mediumTime'}}

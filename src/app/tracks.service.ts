@@ -67,6 +67,31 @@ export class TrainInfo{
   public timestamp_end: number;
 }
 
+export class HistoryData {
+  public readonly track: string;
+
+  public readonly searchBegin?: Date;
+  public readonly searchEnd?: Date;
+  public readonly recordsPerPage?: number;
+  public readonly currentPage?: number;
+
+  public readonly results: Array<RecResult>;
+
+  constructor(track, searchBegin? : Date, searchEnd? : Date, recordsPerPage? : number, currentPage? : number, results? : Array<RecResult>){
+    this.track=track;
+    this.searchBegin=searchBegin;
+    this.searchEnd=searchEnd;
+    this.recordsPerPage=recordsPerPage;
+    this.currentPage=currentPage;
+    if(results){
+      this.results=results;
+    }
+    else{
+      this.results=[];
+    }
+  }
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -125,7 +150,9 @@ export class TracksService {
       console.error("sendRecognize failed at "+track, e);
     });
   }
-  public getHistoryFromScript(track: string): Observable<Array<RecResult>>{
+  public getHistoryFromScript(track: string): Observable<HistoryData>{
+    let res=new HistoryData(track);
+    let rr=res.results;
     return this.http.get(V1SVC_PATH+track).map(r => {
       let rr = [];
       let j=r.json();
@@ -134,15 +161,15 @@ export class TracksService {
           rr.push(new RecResult(x));
         }
       }
-      return rr;
+      return res;
     });
   }
 
-  public getHistory(track: string, begin: Date, end: Date, recordsPerPage?: number, currentPage?: number) : Observable<Array<RecResult>>{
+  public getHistory(track: string, begin: Date, end: Date, recordsPerPage?: number, currentPage?: number) : Observable<HistoryData>{
     return this.videoObjectsService.getObjects().mergeMap(objs => {
       if(objs.eventArchives.length>0){
         return objs.eventArchives[0].getEvents(begin,end,["RailcarNumberRecognition"],[track], recordsPerPage, (currentPage-1)*recordsPerPage)
-          .map(a => a.map(x => new RecResult(x.data)));
+            .map(a => new HistoryData(track, begin, end, recordsPerPage, currentPage, a.map(x => new RecResult(x.data))));
       }
       else {
         return this.getHistoryFromScript(track);
@@ -156,11 +183,11 @@ export class TracksService {
     return this.videoObjectsService.getObjects().mergeMap(objs => {
       if(objs.eventArchives.length>0){
         return objs.eventArchives[0].getSummary(begin,end).map(
-          s => s.filter(x => x.origin==track && x.topic=="RailcarNumberRecognition").map(x => x.count).reduce((p,c) => p+c)
+          s => s.filter(x => x.origin==track && x.topic=="RailcarNumberRecognition").map(x => x.count).reduce((p,c) => p+c, 0)
         );
       }
       else{
-        return this.getHistoryFromScript(track).map(h => h.length);
+        return this.getHistoryFromScript(track).map(h => h.results.length);
       }
     });
   }
