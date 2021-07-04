@@ -94,7 +94,15 @@ export class HistoryComponent implements OnInit {
   }
   public navigate(){
     console.log("naviagate", this.selectedTrack, this.currentPage, this.recordsPerPage, this.searchBegin, this.searchEnd);
-    this.navigateTo(this.selectedTrack, 0, this.currentPage, this.recordsPerPage, this.searchBegin, this.searchEnd);
+    this.navigateTo(this.selectedTrack, this.selectedIndex, this.currentPage, this.recordsPerPage, this.searchBegin, this.searchEnd);
+  }
+  public navigatePage(event){
+    console.log("naviagatePage", event, this.selectedTrack, this.currentPage, this.recordsPerPage, this.searchBegin, this.searchEnd);
+    if(this.currentPage!=event){
+      this.selectedIndex=0;
+      this.currentPage=event;
+    }
+    this.navigateTo(this.selectedTrack, this.selectedIndex);
   }
 
   public updateModelToLocation(params: Params, queryParams: Params){

@@ -63,9 +63,9 @@
 <div class="row" [hidden]="(isSearchCollapsed != true) || (totalRecords &lt; recordsPerPage)">
     <div class="col-12">
         <ngb-pagination [collectionSize]="totalRecords" 
-            [(page)]="currentPage" [pageSize]="recordsPerPage" 
+            [page]="currentPage" [pageSize]="recordsPerPage" 
             [maxSize]="25" [ellipses]="true"
-            [directionLinks]="true" (pageChange)="navigate()"></ngb-pagination>
+            [directionLinks]="true" (pageChange)="navigatePage($event)"></ngb-pagination>
     </div>
 </div>
 <div class="row">
@@ -84,15 +84,14 @@
                 (click)="navigateToRailcarIndex(i)">
                         <th *ngIf="castToRecResult(res)" scope="row">{{ castToRecResult(res).cookie }}</th>
                         <td *ngIf="castToRecResult(res)">
-                            <a (click)="navigateToRailcarIndex(i)">
                                 {{ castToRecResult(res).result }}
-                            </a>
                         </td>
                         <td *ngIf="castToRecResult(res)">{{ castToRecResult(res).confidence*100 | number : '2.1-1' }}</td>
 
                         <td *ngIf="castToTrainInfo(res)" colspan="3">
-                            <b>Состав <a (click)="navigateToRailcarIndex(i)">#{{castToTrainInfo(res).train_number}}</a></b>,
-                            {{castToTrainInfo(res).timestamp_begin | date: 'medium'}}
+                            <b>Состав 
+                                    #{{castToTrainInfo(res).train_number}}
+                            </b>, {{castToTrainInfo(res).timestamp_begin | date: 'medium'}}
                         </td>
                 </tr>
             </tbody>
