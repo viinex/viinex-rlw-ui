@@ -37,16 +37,16 @@
                     Записей на странице: 
                     <div class="btn-group btn-group-toggle" ngbRadioGroup name="radioBasic" [(ngModel)]="recordsPerPage">
                         <label ngbButtonLabel class="btn-primary">
-                          <input ngbButton type="radio" [value]="200">200
+                          <input ngbButton type="radio" [value]="'200'">200
                         </label>
                         <label ngbButtonLabel class="btn-primary">
-                          <input ngbButton type="radio" [value]="1000">1000
+                          <input ngbButton type="radio" [value]="'1000'">1000
                         </label>
                         <label ngbButtonLabel class="btn-primary">
-                          <input ngbButton type="radio" [value]="5000">5000
+                          <input ngbButton type="radio" [value]="'5000'">5000
                         </label>
                         <label ngbButtonLabel class="btn-primary">
-                          <input ngbButton type="radio" [value]="25000">25000
+                          <input ngbButton type="radio" [value]="'25000'">25000
                         </label>
                     </div>                    
                 </div>
@@ -60,10 +60,10 @@
     </div>
 </div>
 </div>
-<div class="row" [hidden]="(isSearchCollapsed != true) || (totalRecords &lt; recordsPerPage)">
-    <div class="col-12">
+<div class="row" [hidden]="(isSearchCollapsed != true) || (!historyData) || (totalRecords &lt; historyData.recordsPerPage)">
+    <div class="col-12" *ngIf="historyData">
         <ngb-pagination [collectionSize]="totalRecords" 
-            [page]="currentPage" [pageSize]="recordsPerPage" 
+            [page]="historyData.currentPage" [pageSize]="historyData.recordsPerPage" 
             [maxSize]="25" [ellipses]="true"
             [directionLinks]="true" (pageChange)="navigatePage($event)"></ngb-pagination>
     </div>

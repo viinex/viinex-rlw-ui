@@ -253,7 +253,7 @@ export class HistoryComponent implements OnInit {
     this.tracksService.getHistory(this.track.name, new Date(this.searchBegin), new Date(this.searchEnd), this.recordsPerPage, this.currentPage).subscribe(h => {
       this.historyData=h;
       this.lastResults=TracksService.produceTrains(this.track, this.historyData.results);
-      console.log("got history", this.lastResults);
+      console.log("got history", this.historyData, this.lastResults);
       if(this.selectedIndex >= 0){
         this.selectedResult=this.castToRecResult(this.lastResults[this.selectedIndex]);
         this.selectedTrain=this.castToTrainInfo(this.lastResults[this.selectedIndex]);
