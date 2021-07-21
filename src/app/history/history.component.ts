@@ -91,16 +91,16 @@ export class HistoryComponent implements OnInit {
     else{
       qp = { index: index };
     }
-    console.log("navigateTo: qp=", qp);
+    console.debug("navigateTo: qp=", qp);
 
     this.router.navigate(["/history", track], {queryParams: qp});
   }
   public navigate(){
-    console.log("naviagate", this.selectedTrack, this.currentPage, this.recordsPerPage, this.searchBegin, this.searchEnd);
+    console.debug("naviagate", this.selectedTrack, this.currentPage, this.recordsPerPage, this.searchBegin, this.searchEnd);
     this.navigateTo(this.selectedTrack, this.selectedIndex, this.currentPage, this.recordsPerPage, this.searchBegin, this.searchEnd);
   }
   public navigatePage(event){
-    console.log("naviagatePage", event, this.selectedTrack, this.currentPage, this.recordsPerPage, this.searchBegin, this.searchEnd);
+    console.debug("naviagatePage", event, this.selectedTrack, this.currentPage, this.recordsPerPage, this.searchBegin, this.searchEnd);
     if(this.currentPage!=event){
       this.selectedIndex=0;
       this.currentPage=event;
@@ -109,7 +109,7 @@ export class HistoryComponent implements OnInit {
   }
 
   public updateModelToLocation(params: Params, queryParams: Params){
-    console.log("updateModelToLocation",params, queryParams);
+    console.debug("updateModelToLocation",params, queryParams);
     this.selectedTrack = params["track"];
     if(this.haveEventsArchive){
       this.currentPage = queryParams["page"];
@@ -128,11 +128,11 @@ export class HistoryComponent implements OnInit {
       (this.historyData.currentPage != this.currentPage) ||
       (this.historyData.recordsPerPage != this.recordsPerPage)));
 
-    console.log("sohouldUPdateModel=",shouldUpdateModel);
+    console.debug("sohouldUPdateModel=",shouldUpdateModel);
 
     if(shouldUpdateModel){
       this.videoObjectsService.getObjects().subscribe(vo => {
-        console.log(params,queryParams);
+        console.debug(params,queryParams);
         this.tracksService.getTrack(this.selectedTrack).subscribe(track => { 
           this.track=track;
           this.videoSources=new Map<string, VideoSource>();
@@ -149,21 +149,21 @@ export class HistoryComponent implements OnInit {
       });
     }
     else{
-      console.log("historyData:", this.historyData);
-      console.log("lastResults:", this.lastResults);
-      console.log("selectedIndex: ", this.selectedIndex);
+      console.debug("historyData:", this.historyData);
+      console.debug("lastResults:", this.lastResults);
+      console.debug("selectedIndex: ", this.selectedIndex);
       this.selectedResult=this.castToRecResult(this.lastResults[this.selectedIndex]);
       this.selectedTrain=this.castToTrainInfo(this.lastResults[this.selectedIndex]);
-      console.log("selectedResult=",this.selectedResult);
-      console.log("selectedTrain=",this.selectedTrain);
+      console.debug("selectedResult=",this.selectedResult);
+      console.debug("selectedTrain=",this.selectedTrain);
     }
 
   }
 
   ngOnInit() {
-    console.log("oninit");
+    console.debug("oninit");
     this.tracksService.haveEventsArchive().subscribe( (v) => { 
-      console.log(v);
+      console.debug(v);
       this.haveEventsArchive = v; 
       if(!this.haveEventsArchive){
         combineLatest(this.route.params, this.route.queryParams).subscribe((p) => {
@@ -237,7 +237,7 @@ export class HistoryComponent implements OnInit {
     if(this.track == null || (this.haveEventsArchive && (this.searchBegin==null || this.searchEnd==null))){
       return;
     }
-    this.tracksService.getSummary(this.track.name, new Date(this.searchBegin), new Date(this.searchEnd)).subscribe(r => { this.totalRecords = r; console.log(r); });
+    this.tracksService.getSummary(this.track.name, new Date(this.searchBegin), new Date(this.searchEnd)).subscribe(r => { this.totalRecords = r; console.debug(r); });
   }
   public getHistory(){
     if(this.track == null || (this.haveEventsArchive && (this.searchBegin==null || this.searchEnd==null))){
@@ -246,7 +246,7 @@ export class HistoryComponent implements OnInit {
     this.tracksService.getHistory(this.track.name, new Date(this.searchBegin), new Date(this.searchEnd), this.recordsPerPage, this.currentPage).subscribe(h => {
       this.historyData=h;
       this.lastResults=TracksService.produceTrains(this.track, this.historyData.results);
-      console.log("got history", this.historyData, this.lastResults);
+      console.debug("got history", this.historyData, this.lastResults);
       if(this.selectedIndex >= 0){
         this.selectedResult=this.castToRecResult(this.lastResults[this.selectedIndex]);
         this.selectedTrain=this.castToTrainInfo(this.lastResults[this.selectedIndex]);
@@ -277,17 +277,15 @@ export class HistoryComponent implements OnInit {
   }
 
   public playVideo(cam: string, begin: number, end: number){
-    //let tref=document.getElementsByName('playVideoElement').item(0);
-    //console.log(tref);
     let m=this.modalService.open(VideoComponent, {size:'lg'});
     m.componentInstance.selectedChannel=this.videoSources[cam];
     m.componentInstance.timestampBegin = begin;
     m.componentInstance.timestampEnd = end;
 
     m.result.then(r => {
-      console.log("playvideo modal closed", r);
+      console.debug("playvideo modal closed", r);
     }).catch(r => {
-      console.log("playvideo modal dismissed", r)
+      console.debug("playvideo modal dismissed", r)
     });
   }
 
