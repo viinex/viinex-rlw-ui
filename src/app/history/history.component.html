@@ -62,7 +62,7 @@
 </div>
 <div class="row" [hidden]="(isSearchCollapsed != true) || (!historyData) || (totalRecords &lt; historyData.recordsPerPage)">
     <div class="col-12" *ngIf="historyData">
-        <ngb-pagination [collectionSize]="totalRecords" 
+        <ngb-pagination [hidden]="!haveEventsArchive" [collectionSize]="totalRecords" 
             [page]="historyData.currentPage" [pageSize]="historyData.recordsPerPage" 
             [maxSize]="25" [ellipses]="true"
             [directionLinks]="true" (pageChange)="navigatePage($event)"></ngb-pagination>

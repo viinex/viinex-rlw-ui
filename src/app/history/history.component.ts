@@ -42,8 +42,6 @@ export class HistoryComponent implements OnInit {
   public isSearchCollapsed: boolean;
 
   hoveredDate: NgbDate | null = null;
-  // fromDate: NgbDate;
-  // toDate: NgbDate | null = null;
   public recordsPerPage : number = 200;
   public currentPage : number = 0;
   public totalRecords : number = 0;
@@ -72,22 +70,27 @@ export class HistoryComponent implements OnInit {
   private dateAdapter: NgbDateNativeAdapter = new NgbDateNativeAdapter();
 
   public navigateToRailcarIndex(i: number){
-    //this.router.navigate(['/history', this.track.name], {queryParams: {index: i}});
     this.navigateTo(this.track.name, i);
   }
   public navigateTo(track: string, index?: number, page?: number, pageSize?: number, begin?: Date, end?: Date){
-    let endf = end ? new Date(end) : (this.searchEnd? new Date(this.searchEnd) : new Date());
-    let beginf = (end && begin) ? new Date(begin) : (this.searchEnd && this.searchBegin ? new Date(this.searchBegin) : new Date(endf.valueOf() - 24*60*60));
-    let pagef = (isFinite(page) && (page > 0)) ? page : (isFinite(this.currentPage) && (this.currentPage>0) ? this.currentPage : 1);
-    let pageSizef = (isFinite(pageSize) && (pageSize > 0)) ? pageSize : (isFinite(this.recordsPerPage) && (this.recordsPerPage>0) ? this.recordsPerPage : 1000);
+    let qp;
+    if(this.haveEventsArchive){
+      let endf = end ? new Date(end) : (this.searchEnd? new Date(this.searchEnd) : new Date());
+      let beginf = (end && begin) ? new Date(begin) : (this.searchEnd && this.searchBegin ? new Date(this.searchBegin) : new Date(endf.valueOf() - 24*60*60));
+      let pagef = (isFinite(page) && (page > 0)) ? page : (isFinite(this.currentPage) && (this.currentPage>0) ? this.currentPage : 1);
+      let pageSizef = (isFinite(pageSize) && (pageSize > 0)) ? pageSize : (isFinite(this.recordsPerPage) && (this.recordsPerPage>0) ? this.recordsPerPage : 1000);
 
-    let qp = {
-      begin: beginf.toISOString(),
-      end: endf.toISOString(),
-      pageSize: pageSizef,
-      page: pagef,
-      index: index
-    };
+      qp = {
+        begin: beginf.toISOString(),
+        end: endf.toISOString(),
+        pageSize: pageSizef,
+        page: pagef,
+        index: index
+      };
+    }
+    else{
+      qp = { index: index };
+    }
     console.log("navigateTo: qp=", qp);
 
     this.router.navigate(["/history", track], {queryParams: qp});
@@ -108,29 +111,22 @@ export class HistoryComponent implements OnInit {
   public updateModelToLocation(params: Params, queryParams: Params){
     console.log("updateModelToLocation",params, queryParams);
     this.selectedTrack = params["track"];
-    this.currentPage = queryParams["page"];
-    this.recordsPerPage = queryParams["pageSize"];
-    this.searchBegin = new Date(queryParams["begin"]);
-    this.searchEnd = new Date(queryParams["end"]);
-    this.selectedIndex=queryParams["index"];
-
-    console.log("updateModelToLocation", this.selectedTrack, this.currentPage, this.recordsPerPage, this.searchBegin, this.searchEnd);
-    if(this.historyData){
-      console.log("this.historyData",this.historyData.track, this.historyData.searchBegin, this.historyData.searchEnd, this.historyData.currentPage, this.historyData.recordsPerPage);
-      console.log(this.historyData.track != this.selectedTrack);
-      console.log(this.historyData.searchBegin.valueOf() != this.searchBegin.valueOf());
-      console.log(this.historyData.searchEnd.valueOf() != this.searchEnd.valueOf());
-      console.log(this.historyData.currentPage != this.currentPage);
-      console.log(this.historyData.recordsPerPage != this.recordsPerPage);
+    if(this.haveEventsArchive){
+      this.currentPage = queryParams["page"];
+      this.recordsPerPage = queryParams["pageSize"];
+      this.searchBegin = new Date(queryParams["begin"]);
+      this.searchEnd = new Date(queryParams["end"]);
     }
+    this.selectedIndex=queryParams["index"];
 
     let shouldUpdateModel : boolean = false ||
       (this.historyData == null) ||
       (this.historyData.track != this.selectedTrack) ||
+      (this.haveEventsArchive && (
       (this.historyData.searchBegin.valueOf() != this.searchBegin.valueOf()) ||
       (this.historyData.searchEnd.valueOf() != this.searchEnd.valueOf()) ||
       (this.historyData.currentPage != this.currentPage) ||
-      (this.historyData.recordsPerPage != this.recordsPerPage);
+      (this.historyData.recordsPerPage != this.recordsPerPage)));
 
     console.log("sohouldUPdateModel=",shouldUpdateModel);
 
@@ -170,12 +166,9 @@ export class HistoryComponent implements OnInit {
       console.log(v);
       this.haveEventsArchive = v; 
       if(!this.haveEventsArchive){
-        this.route.queryParams.subscribe(qp =>{
-          this.selectedIndex=qp["index"];
-          if(this.lastResults){
-            this.selectedResult=this.castToRecResult(this.lastResults[this.selectedIndex]);
-            this.selectedTrain=this.castToTrainInfo(this.lastResults[this.selectedIndex]);
-          }
+        combineLatest(this.route.params, this.route.queryParams).subscribe((p) => {
+          let [params, queryParams] = p;
+          this.updateModelToLocation(params, queryParams);
         });
       }
       else{
@@ -241,13 +234,13 @@ export class HistoryComponent implements OnInit {
   //end datepicker stuff
 
   public getSummary(){
-    if(this.track == null || this.searchBegin==null || this.searchEnd==null){
+    if(this.track == null || (this.haveEventsArchive && (this.searchBegin==null || this.searchEnd==null))){
       return;
     }
     this.tracksService.getSummary(this.track.name, new Date(this.searchBegin), new Date(this.searchEnd)).subscribe(r => { this.totalRecords = r; console.log(r); });
   }
   public getHistory(){
-    if(this.track == null || this.searchBegin==null || this.searchEnd==null){
+    if(this.track == null || (this.haveEventsArchive && (this.searchBegin==null || this.searchEnd==null))){
       return;
     }
     this.tracksService.getHistory(this.track.name, new Date(this.searchBegin), new Date(this.searchEnd), this.recordsPerPage, this.currentPage).subscribe(h => {

@@ -179,10 +179,9 @@ export class TracksService {
     });
   }
   public getHistoryFromScript(track: string): Observable<HistoryData>{
-    let res=new HistoryData(track);
-    let rr=res.results;
     return this.http.get(V1SVC_PATH+track).map(r => {
-      let rr = [];
+      let res=new HistoryData(track);
+      let rr=res.results;
       let j=r.json();
       for(let x of j.last_railcars){
         if(x.train_number != j.train_number){ // берем все вагоны кроме относящихся к текущему составу
