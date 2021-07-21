@@ -17,16 +17,52 @@ export class TrackInfo{
 }
 
 export class Timestamps{
-  public best?: number;
-  public first: number;
-  public last: number;
-  public show: number;
+  public best?: Date;
+  public first: Date;
+  public last: Date;
+  public show: Date;
+
+  public constructor(x: any){
+    this.first=Timestamps.fixDate(x.first);
+    this.last=Timestamps.fixDate(x.last);
+    this.best=Timestamps.fixDate(x.best);
+    if(this.best){
+      this.show=this.best;
+    }
+    else{
+      this.show = new Date(Math.round((this.last.valueOf() + this.first.valueOf())/2));
+    }
+}
+  public static fixDate(d: any): Date{
+    if(!d){
+      return null;
+    }
+    if(typeof(d)==='object'){
+      return d;
+    }
+    else{
+      if(typeof(d)==='number'){
+        if(Number.isFinite(d)){
+          return new Date(d);
+        }
+        else{
+          return null;
+        }
+      }
+      return new Date(d);
+    }
+  }
 }
 
 export class ChanInfo{
   public video_source: string;
-  public confidence: string;
+  public confidence: number;
   public timestamps: Timestamps;
+  constructor(x: any){
+    this.video_source=x.video_source;
+    this.confidence=x.confidence;
+    this.timestamps=new Timestamps(x.timestamps);
+  }
 }
 
 export class RecResult{
@@ -36,8 +72,8 @@ export class RecResult{
   public confidence: number;
   public cookie: number;
   public channels: Array<ChanInfo>;
-  public timestamp_begin?: number;
-  public timestamp_end?: number;
+  public timestamp_begin: Date;
+  public timestamp_end: Date;
 
   public constructor(x: any){
     this.track=x.track;
@@ -45,17 +81,9 @@ export class RecResult{
     this.result=x.result;
     this.confidence=x.confidence;
     this.cookie=x.cookie;
-    this.channels=x.channels.filter(c => c.timestamps != null);
-    this.timestamp_begin=Math.min(...this.channels.map(c => c.timestamps.first));
-    this.timestamp_end=Math.max(...this.channels.map(c => c.timestamps.last));
-    for(let ci of this.channels){
-      if(ci.timestamps.best){
-        ci.timestamps.show=ci.timestamps.best;
-      }
-      else{
-        ci.timestamps.show = Math.round((ci.timestamps.last + ci.timestamps.first)/2);
-      }
-    }
+    this.channels=x.channels.filter(c => c.timestamps != null).map(x => new ChanInfo(x));
+    this.timestamp_begin=this.channels.length?new Date(Math.min(...this.channels.map(c => c.timestamps.first.valueOf()))):null;
+    this.timestamp_end=this.channels.length?new Date(Math.max(...this.channels.map(c => c.timestamps.last.valueOf()))):null;
   }
 }
 
@@ -63,8 +91,8 @@ export class TrainInfo{
   public track: string;
   public train_number: number;
   public channels: Array<string>;
-  public timestamp_begin: number;
-  public timestamp_end: number;
+  public timestamp_begin: Date;
+  public timestamp_end: Date;
 }
 
 export class HistoryData {
@@ -197,6 +225,9 @@ export class TracksService {
     let ti : TrainInfo = null;
     for(let k=rr.length-1; k>=0; --k){
       let r = rr[k];
+      if(r.timestamp_begin==null && r.timestamp_end==null && r.result==null && r.channels.length==0){
+        continue;
+      }
       if(ti == null || ti.train_number != r.train_number){
         if(ti){
           res.push(ti);

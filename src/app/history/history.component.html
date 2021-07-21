@@ -100,7 +100,7 @@
     <div class="col-8" *ngIf="selectedResult">
         <div class="card-deck noscroll">
             <div class="card p-1 mb-2 histcard" *ngFor="let ch of selectedResult.channels">
-                <img class="card-img-top" [src]="videoSources[ch.video_source].videoTracks[0].getSnapshotImage+'?timestamp='+ch.timestamps.show" 
+                <img class="card-img-top" [src]="videoSources[ch.video_source].videoTracks[0].getSnapshotImage(ch.timestamps.show)" 
                     (error)="onImgError($event)"/>
                 <div class="card-block">
                     <b>{{videoSources[ch.video_source].displayName}}</b> &nbsp; {{ch.timestamps.best | date : 'medium'}}
@@ -108,7 +108,7 @@
                     <button 
                         class="btn btn-outline-secondary btn-sm"
                         (click)="playVideo(ch.video_source, ch.timestamps.first, ch.timestamps.last)">Просмотр видео</button>&nbsp;
-                    <a [href]="videoSources[ch.video_source].videoTracks[0].getSnapshotImage+'?timestamp='+ch.timestamps.show"
+                    <a [href]="videoSources[ch.video_source].videoTracks[0].getSnapshotImage(ch.timestamps.show)"
                         class="btn btn-outline-secondary btn-sm"
                         [download]="selectedResult.result+'_'+ch.video_source+'_'+ch.timestamps.show+'.jpg'">Скачать JPEG</a>&nbsp;
                     <a [href]="videoSources[ch.video_source].videoTracks[0].getMp4(ch.timestamps.first, ch.timestamps.last)"
@@ -118,7 +118,7 @@
             </div>
 
             <div class="card p-1 mb-2 histcard" *ngFor="let ch of supplementaryChannels(selectedResult)">
-                <img class="card-img-top" [src]="videoSources[ch].videoTracks[0].getSnapshotImage+'?timestamp='+selectedResult.timestamp_begin" 
+                <img class="card-img-top" [src]="videoSources[ch].videoTracks[0].getSnapshotImage(selectedResult.timestamp_begin)" 
                     (error)="onImgError($event)"/>
                 <div class="card-block">
                     <b>{{videoSources[ch].displayName}}</b> <br/>
@@ -135,7 +135,7 @@
     <div class="col-8" *ngIf="selectedTrain">
         <div class="card-deck noscroll">
             <div class="card p-1 mb-2 histcard" *ngFor="let ch of selectedTrain.channels">
-                <img class="card-img-top" [src]="videoSources[ch].videoTracks[0].getSnapshotImage+'?timestamp='+selectedTrain.timestamp_begin"
+                <img class="card-img-top" [src]="videoSources[ch].videoTracks[0].getSnapshotImage(selectedTrain.timestamp_begin)"
                     (error)="onImgError($event)" />
                 <div class="card-block">
                     <b>{{videoSources[ch].displayName}}</b> <br/> 

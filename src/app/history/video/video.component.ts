@@ -14,8 +14,8 @@ export class VideoComponent implements OnInit, OnDestroy {
   constructor(public activeModal: NgbActiveModal) { }
 
   @Input() public selectedChannel : VideoSource;
-  @Input() public timestampBegin : number;
-  @Input() public timestampEnd : number;
+  @Input() public timestampBegin : Date;
+  @Input() public timestampEnd : Date;
 
   private hls: Hls;
   public streamURL: string;
