@@ -276,7 +276,7 @@ export class HistoryComponent implements OnInit {
     return this.track.channels.filter(c => !rc.includes(c));
   }
 
-  public playVideo(cam: string, begin: number, end: number){
+  public playVideo(cam: string, begin: Date, end: Date){
     let m=this.modalService.open(VideoComponent, {size:'lg'});
     m.componentInstance.selectedChannel=this.videoSources[cam];
     m.componentInstance.timestampBegin = begin;
