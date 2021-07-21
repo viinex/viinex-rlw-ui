@@ -228,7 +228,7 @@ export class TracksService {
       if(r.timestamp_begin==null && r.timestamp_end==null && r.result==null && r.channels.length==0){
         continue;
       }
-      if(ti == null || ti.train_number != r.train_number){
+      if((ti == null) || (ti.train_number != r.train_number) || (Math.abs(r.timestamp_end.valueOf() - ti.timestamp_end.valueOf()) > 60000)){
         if(ti){
           res.push(ti);
         }
