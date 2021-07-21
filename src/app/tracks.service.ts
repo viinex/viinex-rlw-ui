@@ -69,6 +69,7 @@ export class RecResult{
   public track: string;
   public train_number: number;
   public result: string;
+  public valid: boolean;
   public confidence: number;
   public cookie: number;
   public channels: Array<ChanInfo>;
@@ -79,6 +80,7 @@ export class RecResult{
     this.track=x.track;
     this.train_number=x.train_number;
     this.result=x.result;
+    this.valid=x.valid;
     this.confidence=x.confidence;
     this.cookie=x.cookie;
     this.channels=x.channels.filter(c => c.timestamps != null).map(x => new ChanInfo(x));

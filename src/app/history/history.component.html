@@ -83,7 +83,7 @@
                 [ngClass]="{'table-primary': i==this.selectedIndex}"
                 (click)="navigateToRailcarIndex(i)">
                         <th *ngIf="castToRecResult(res)" scope="row">{{ castToRecResult(res).cookie }}</th>
-                        <td *ngIf="castToRecResult(res)">
+                        <td *ngIf="castToRecResult(res)" [ngClass]="{'invalidresult': !res.valid }">
                                 {{ castToRecResult(res).result }}
                         </td>
                         <td *ngIf="castToRecResult(res)">{{ castToRecResult(res).confidence*100 | number : '2.1-1' }}</td>
