@@ -173,7 +173,7 @@ export class EventArchive {
     constructor(private http: Http, public name: string, public metaData: any){
     }
     public getSummary(begin?: Date, end?: Date) : Observable<EventArchiveSummary>{
-        return this.http.get(V1SVC_PATH+this.name+"/summary"+EventArchive.queryParams(begin,end)).map(
+        return this.http.get(V1SVC_PATH+this.name+"/events/summary"+EventArchive.queryParams(begin,end)).map(
             (res: Response) => {
                 let body=<EventArchiveSummary>res.json();
                 return body;
@@ -181,7 +181,7 @@ export class EventArchive {
         );
     }
     public getEvents(begin?: Date, end?: Date, topics?: Array<string>, origins?: Array<string>, limit?: number, offset? : number) : Observable<Array<EventDesc>>{
-        return this.http.get(V1SVC_PATH+this.name+EventArchive.queryParams(begin,end, topics, origins, limit, offset))
+        return this.http.get(V1SVC_PATH+this.name+"/events"+EventArchive.queryParams(begin,end, topics, origins, limit, offset))
             .map((res: Response) => <Array<EventDesc>>res.json());
     }
     private static queryParams(begin?: Date, end?: Date, topics?: Array<string>, origins?: Array<string>, limit?: number, offset? : number) : string {
