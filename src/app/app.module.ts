@@ -35,7 +35,7 @@ registerLocaleData(localeRu, 'ru');
     FormsModule
   ],
   providers: [VideoObjectsService,
-    { provide: LOCALE_ID, useValue: "ru" }
+    { provide: LOCALE_ID, useValue: "en" }
   ],
   bootstrap: [AppComponent],
   entryComponents:[VideoComponent]

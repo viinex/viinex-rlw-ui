@@ -1,13 +1,13 @@
-<a [routerLink]="['/']" routerLinkActive="true" >К главной</a>
-<h2 *ngIf="track">{{track.displayName}} <small> :: мониторинг в реальном времени</small></h2>
-<div class="card-columns">
-    <div class="card border-0">
+<a [routerLink]="['/']" routerLinkActive="true" >До головної</a>
+<h2 *ngIf="track">{{track.displayName}} <small> :: моніторинг в реальному часі</small></h2>
+<div class="row">
+    <div class="col-4">
         <button class="w-100 btn btn-outline-secondary btn-lg" *ngIf="track &amp;&amp; track.api" 
             (mousedown)="sendRecognize(true)" (mouseup)="sendRecognize(false)"
-            ngbTooltip="Нажмите эту кнопку для начала распознавания номера вагона, и отпустите для окончания"
+            ngbTooltip="Натисність і утримуйте цю кнопку аби почати розпізнавання, відпустіть для закінчення розпізнавання"
             placement="right"
             [openDelay]="5000" [closeDelay]="3000">
-            Управление распознаванием
+            Керування розпізнаванням
         </button>
         <div class="shadow w-100">
             <p class="text-monospace mon-rec-result text-center">{{(last_result &amp;&amp; last_result.result) ? last_result.result : "--------"}}</p>
@@ -16,9 +16,9 @@
             <thead>
                 <tr>
                     <th># п/п</th>
-                    <th># состава</th>
-                    <th>Распознанный номер</th>
-                    <th>Уверенность, %</th>
+                    <th>Потяг #</th>
+                    <th>Розпізнаний номер</th>
+                    <th>Впевненість, %</th>
                 </tr>
             </thead>
             <tbody>
@@ -30,11 +30,15 @@
                 </tr>
             </tbody>
         </table>
-    </div> <!--col-3 -->
-    <div *ngFor="let k of [0,1,2,3,4]" class="card p-1" [hidden]="!(viewports && viewports[k].viewportVisible)">
-        <video class="viewport card-img" playsinline [muted]=true controls autoplay width="100%"></video>
-        <div class="card-block p-1">
-            <h5>{{viewports ? viewports[k].sourceName : ""}}</h5>
+    </div> <!--col-4 -->
+    <div class="col-8">
+        <div class="card-deck">
+            <div *ngFor="let k of [0,1,2,3,4]" class="card" [hidden]="!(viewports && viewports[k].viewportVisible)">
+                <video class="viewport card-img" playsinline [muted]=true controls autoplay width="100%"></video>
+                <div class="card-block">
+                    <h5>{{viewports ? viewports[k].sourceName : ""}}</h5>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
+    </div> <!--col-8 -->
+</div> <!--row -->

@@ -1,11 +1,11 @@
 <div class="container-fluid">
-<a [routerLink]="['/']" routerLinkActive="true" >К главной</a>
+<a [routerLink]="['/']" routerLinkActive="true" >До головної</a>
 <div class="row">
     <div class="col-12">
-        <h2 *ngIf="track">{{track.displayName}}<small *ngIf="!haveEventsArchive"> :: недавняя история</small>
+        <h2 *ngIf="track">{{track.displayName}}<small *ngIf="!haveEventsArchive"> :: історичні дані</small>
         <small *ngIf="haveEventsArchive"> :: 
             <a type="button" (click)="isSearchCollapsed = !isSearchCollapsed" class="queryparams">
-            с {{ searchBegin | date : 'shortDate' }} по {{ searchEnd | date : 'shortDate' }} 
+            від {{ searchBegin | date : 'shortDate' }} до {{ searchEnd | date : 'shortDate' }} 
             </a>
         </small>
         </h2>
@@ -15,7 +15,7 @@
 <div #searchParams="ngbCollapse" [ngbCollapse]="isSearchCollapsed" class="col-6">
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">Параметры поиска</h5>
+            <h5 class="card-title">Параметри пошуку</h5>
             <div class="card-text">
                 <div class="col-4">
                     <ngb-datepicker #dp (select)="onDateSelection($event)" [displayMonths]="2" [dayTemplate]="dayTemplate" outsideDays="hidden">
@@ -34,7 +34,7 @@
                 </div>
                 <p>
                 <div class="col-12">
-                    Записей на странице: 
+                    Записів на сторінці: 
                     <div class="btn-group btn-group-toggle" ngbRadioGroup name="radioBasic" [(ngModel)]="recordsPerPage">
                         <label ngbButtonLabel class="btn-primary">
                           <input ngbButton type="radio" [value]="'200'">200
@@ -48,13 +48,13 @@
                         <label ngbButtonLabel class="btn-primary">
                           <input ngbButton type="radio" [value]="'25000'">25000
                         </label>
-                    </div>                    
+                    </div>
                 </div>
             </div>
             <div>
                 <p>
                 <hr/>
-                <button type="button" class="btn btn-primary" (click)="navigate(); isSearchCollapsed=true;" [disabled]="!(searchBegin && searchEnd)">Применить</button>
+                <button type="button" class="btn btn-primary" (click)="navigate(); isSearchCollapsed=true;" [disabled]="!(searchBegin && searchEnd)">Застосувати</button>
             </div>
         </div>
     </div>
@@ -74,8 +74,8 @@
             <thead>
                 <tr>
                     <th># п/п</th>
-                    <th>Распознанный номер</th>
-                    <th>Уверенность, %</th>
+                    <th>Розпізнаний номер</th>
+                    <th>Впевненість, %</th>
                 </tr>
             </thead>
             <tbody>
@@ -89,7 +89,7 @@
                         <td *ngIf="castToRecResult(res)">{{ castToRecResult(res).confidence*100 | number : '2.1-1' }}</td>
 
                         <td *ngIf="castToTrainInfo(res)" colspan="3">
-                            <b>Состав 
+                            <b>Потяг 
                                     #{{castToTrainInfo(res).train_number}}
                             </b>, {{castToTrainInfo(res).timestamp_begin | date: 'medium'}}
                         </td>
@@ -107,13 +107,13 @@
                     <br/>
                     <button 
                         class="btn btn-outline-secondary btn-sm"
-                        (click)="playVideo(ch.video_source, ch.timestamps.first, ch.timestamps.last)">Просмотр видео</button>&nbsp;
+                        (click)="playVideo(ch.video_source, ch.timestamps.first, ch.timestamps.last)">Перегляд відео</button>&nbsp;
                     <a [href]="videoSources[ch.video_source].videoTracks[0].getSnapshotImage(ch.timestamps.show)"
                         class="btn btn-outline-secondary btn-sm"
-                        [download]="selectedResult.result+'_'+ch.video_source+'_'+ch.timestamps.show+'.jpg'">Скачать JPEG</a>&nbsp;
+                        [download]="selectedResult.result+'_'+ch.video_source+'_'+ch.timestamps.show+'.jpg'">Завантажити JPEG</a>&nbsp;
                     <a [href]="videoSources[ch.video_source].videoTracks[0].getMp4(ch.timestamps.first, ch.timestamps.last)"
                         class="btn btn-outline-secondary btn-sm"
-                        [download]="selectedResult.result+'_'+ch.video_source+'_'+ch.timestamps.first+'.mp4'">Скачать MP4</a>
+                        [download]="selectedResult.result+'_'+ch.video_source+'_'+ch.timestamps.first+'.mp4'">Завантажити MP4</a>
                 </div>
             </div>
 
@@ -124,10 +124,10 @@
                     <b>{{videoSources[ch].displayName}}</b> <br/>
                     <button 
                         class="btn btn-outline-secondary btn-sm"
-                        (click)="playVideo(ch, selectedResult.timestamp_begin, selectedResult.timestamp_end)">Просмотр видео</button>&nbsp;
+                        (click)="playVideo(ch, selectedResult.timestamp_begin, selectedResult.timestamp_end)">Перегляд відео</button>&nbsp;
                     <a [href]="videoSources[ch].videoTracks[0].getMp4(selectedResult.timestamp_begin, selectedResult.timestamp_end)"
                         class="btn btn-outline-secondary btn-sm"
-                        [download]="selectedResult.result+'_'+ch+'_'+selectedResult.timestamp_begin+'.mp4'">Скачать MP4</a>
+                        [download]="selectedResult.result+'_'+ch+'_'+selectedResult.timestamp_begin+'.mp4'">Завантажити MP4</a>
                 </div>
             </div>
         </div>
@@ -143,10 +143,10 @@
                     <br/>
                     <button 
                         class="btn btn-outline-secondary btn-sm"
-                        (click)="playVideo(ch, selectedTrain.timestamp_begin, selectedTrain.timestamp_end)">Просмотр видео</button>&nbsp;
+                        (click)="playVideo(ch, selectedTrain.timestamp_begin, selectedTrain.timestamp_end)">Перегляд відео</button>&nbsp;
                     <a [href]="videoSources[ch].videoTracks[0].getMp4(selectedTrain.timestamp_begin, selectedTrain.timestamp_end)"
                         class="btn btn-outline-secondary btn-sm"
-                        [download]="selectedTrain.train_number+'_'+ch.video_source+'_'+selectedTrain.timestamp_begin+'.mp4'">Скачать MP4</a>
+                        [download]="selectedTrain.train_number+'_'+ch.video_source+'_'+selectedTrain.timestamp_begin+'.mp4'">Завантажити MP4</a>
                 </div>
             </div>
         </div>

@@ -1,4 +1,4 @@
-<h2>Обслуживаемые ЖД пути</h2>
+<h2>Колії що обслуговуються</h2>
 <div class="card-columns">
     <div *ngFor="let track of tracks" class="card">
             <!--img *ngIf="track.liveSnapshotURIs.length != 0" 
@@ -17,10 +17,10 @@
         </ngb-carousel>
         <div class="card-block p-3">
             <h4>{{track.displayName}}</h4>
-            Видеоканалов: <span class="badge badge-info">{{track.channels.length}}</span>
+            Відеоканалів: <span class="badge badge-info">{{track.channels.length}}</span>
             <p *ngIf="track.description != null">{{track.description}}</p>
-            <a routerLink="/live-mon/{{track.name}}" role="button" class="btn btn-outline-primary">Мониторинг</a>&nbsp;
-            <a routerLink="/history/{{track.name}}" role="button" class="btn btn-outline-secondary">История</a>
+            <a routerLink="/live-mon/{{track.name}}" role="button" class="btn btn-outline-primary">Моніторинг</a>&nbsp;
+            <a routerLink="/history/{{track.name}}" role="button" class="btn btn-outline-secondary">Історичні дані</a>
         </div>
     </div>
 </div>
