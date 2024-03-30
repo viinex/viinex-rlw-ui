@@ -59,7 +59,19 @@
                   "maximumError": "10kb"
                 }
               ]
+            },
+            "development": {
+              "optimization": false,
+              "outputHashing": "all",
+              "sourceMap": true,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": false,
+              "extractLicenses": false,
+              "vendorChunk": false,
+              "buildOptimizer": false
             }
+
           }
         },
         "serve": {
@@ -70,6 +82,9 @@
           "configurations": {
             "production": {
               "browserTarget": "vnxrlw:build:production"
+            },
+            "development": {
+              "browserTarget": "vnxrlw:build:development"
             }
           }
         },
