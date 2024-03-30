@@ -2,7 +2,8 @@ import { Observable } from 'rxjs';
 import { Http, Response } from '@angular/http';
 import { stringify } from '@angular/compiler/src/util';
 
-export const V1SVC_PATH = location.origin + "/v1/svc/";
+export const API_ORIGIN = location.origin;
+export const V1SVC_PATH = API_ORIGIN + "/v1/svc/";
 
 export class VideoSource {
     constructor(public name:string, public isLive: boolean, public metaData: any){
@@ -108,6 +109,10 @@ export class WebRTCServer {
                     this.iceServers.push({urls:"stun:"+host+":"+port});
                 }
             }
+            if(null != metaData.iceServers){
+                this.iceServers=this.iceServers.concat(metaData.iceServers);
+            }
+            console.debug("iceServers for ", name, ": ", this.iceServers);
         }
         else{
             this.displayName = name;

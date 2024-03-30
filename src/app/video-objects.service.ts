@@ -22,7 +22,8 @@ import {
     EventArchive,
     WebRTCServer,
     WebRTCServerSummary,
-    V1SVC_PATH
+    V1SVC_PATH,
+    API_ORIGIN
 } from './video-objects'
 
 @Injectable({providedIn:'root'})
@@ -30,7 +31,7 @@ export class VideoObjectsService {
     public webSocket : WebSocketSubject<any>;
     constructor(private http: Http){
       let cfg : WebSocketSubjectConfig<any>={
-        url:"ws://"+location.host,
+        url: API_ORIGIN.replace(/^http:/,"ws:").replace(/^https:/,"wss:"),
         openObserver:{
           next: ()=>{
             console.log("websocket connected");
