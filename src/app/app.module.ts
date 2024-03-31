@@ -15,6 +15,7 @@ import { VideoObjectsService } from './video-objects.service';
 import { LiveMonComponent } from './live-mon/live-mon.component';
 import { HistoryComponent } from './history/history.component';
 import { VideoComponent } from './history/video/video.component';
+import { CookieService } from 'ngx-cookie-service';
 
 registerLocaleData(localeRu, 'ru');
 
@@ -34,8 +35,8 @@ registerLocaleData(localeRu, 'ru');
     NgbModule,
     FormsModule
   ],
-  providers: [VideoObjectsService,
-    { provide: LOCALE_ID, useValue: "en" }
+  providers: [VideoObjectsService, CookieService,
+    { provide: LOCALE_ID, useValue: "en-US" }
   ],
   bootstrap: [AppComponent],
   entryComponents:[VideoComponent]

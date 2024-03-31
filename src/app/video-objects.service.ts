@@ -3,6 +3,7 @@ import { Http, Response } from '@angular/http';
 
 import { Observable } from "rxjs";
 import { webSocket,WebSocketSubjectConfig, WebSocketSubject } from 'rxjs/webSocket';
+import { CookieService } from 'ngx-cookie-service';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/mergeMap';
@@ -29,12 +30,16 @@ import {
 @Injectable({providedIn:'root'})
 export class VideoObjectsService {
     public webSocket : WebSocketSubject<any>;
-    constructor(private http: Http){
+    constructor(private http: Http, private cookieService: CookieService){
       let cfg : WebSocketSubjectConfig<any>={
         url: API_ORIGIN.replace(/^http:/,"ws:").replace(/^https:/,"wss:"),
         openObserver:{
           next: ()=>{
             console.log("websocket connected");
+            let token = this.cookieService.get("auth");
+            if(token != null){
+                this.webSocket.next(["authenticate", token]);
+            }
             this.webSocket.next(["subscribe",{}]);
             //this.webSocket.next(JSON.stringify(["subscribe",{"topics":["RailcarNumberRecognition"]}]));
           }
