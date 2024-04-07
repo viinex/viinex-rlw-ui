@@ -16,6 +16,10 @@ import { LiveMonComponent } from './live-mon/live-mon.component';
 import { HistoryComponent } from './history/history.component';
 import { VideoComponent } from './history/video/video.component';
 import { CookieService } from 'ngx-cookie-service';
+import { LoginGuardService } from './login-guard.service';
+import { LoginComponent } from './login.component';
+import { LoginService } from './login.service';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 registerLocaleData(localeRu, 'ru');
 
@@ -26,16 +30,18 @@ registerLocaleData(localeRu, 'ru');
     TracksComponent,
     LiveMonComponent,
     HistoryComponent,
-    VideoComponent
+    VideoComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
     HttpModule,
     AppRoutingModule,
     NgbModule,
-    FormsModule
+    FormsModule,
+    HttpClientModule,
   ],
-  providers: [VideoObjectsService, CookieService,
+  providers: [VideoObjectsService, CookieService, LoginGuardService, LoginService, HttpClient,
     { provide: LOCALE_ID, useValue: "en-US" }
   ],
   bootstrap: [AppComponent],
