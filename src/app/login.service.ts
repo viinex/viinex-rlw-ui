@@ -5,6 +5,8 @@ import { map, mergeMap, catchError } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http'
 
 import { CookieService } from 'ngx-cookie-service';
+import * as Cookies from 'js-cookie';
+
 import * as Crypto from 'crypto-js';
 import * as jwtDecode from 'jwt-decode'
 
@@ -177,7 +179,7 @@ export class LoginService {
                 }));
     }
     public logout(){
-        this.cookieService.delete("auth", "/", location.host);
+        Cookies.remove('auth');
         this.setLoginStatus(new LoginStatus(Transport.None, false));
         return this.checkLoginStatus();
     }
